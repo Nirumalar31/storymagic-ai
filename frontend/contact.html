@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact Us — StoryMagic AI</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="animations.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body>
+
+  <!-- Background Layers -->
+  <div class="bg-stars"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Navigation -->
+  <nav class="nav-pill">
+    <a href="index.html" class="nav-pill-logo">
+      <img src="images/Logo.png" alt="StoryMagic Logo" class="nav-logo-img">
+    </a>
+    <div class="nav-pill-links">
+      <a href="index.html">Home</a>
+      <a href="characters.html">Characters</a>
+      <a href="parent.html">Parents</a>
+    </div>
+    <div class="nav-pill-auth"></div>
+  </nav>
+
+  <main class="page-wrapper" style="display:flex; align-items:center; justify-content:center; padding-top: 150px; padding-bottom: 80px;">
+    <div class="auth-container" style="width: 100%; max-width: 500px; padding: 0 24px;">
+      
+      <div class="glass-panel" style="padding: 50px 40px; text-align: center;">
+        <h1 class="dreamy-title" style="font-size: 2.2rem; margin-bottom: 32px;">Get in <span>Touch</span></h1>
+        <p style="color: rgba(255,255,255,0.7); font-weight: 600; margin-bottom: 32px;">Have a question or a magical idea? Send us a message!</p>
+        
+        <form id="contactForm" style="display: flex; flex-direction: column; gap: 20px; text-align: left;">
+          <div>
+            <label class="form-label" style="display:block; margin-bottom:8px; font-weight:700;">Your Name</label>
+            <input type="text" class="form-input" placeholder="Explorer Name" required style="background: rgba(255,255,255,0.05);">
+          </div>
+          
+          <div>
+            <label class="form-label" style="display:block; margin-bottom:8px; font-weight:700;">Email Address</label>
+            <input type="email" class="form-input" placeholder="hello@magic.com" required style="background: rgba(255,255,255,0.05);">
+          </div>
+
+          <div>
+            <label class="form-label" style="display:block; margin-bottom:8px; font-weight:700;">What's on your mind?</label>
+            <textarea class="form-input" rows="4" placeholder="Type your message here..." style="background: rgba(255,255,255,0.05); resize: none; border-radius: 20px;"></textarea>
+          </div>
+
+          <button type="button" class="btn dreamy-btn-pink jelly-hover" style="width: 100%; margin-top: 10px;" onclick="alert('Message Sent! 🦉')">Send Message ✨</button>
+        </form>
+
+        <div style="margin-top: 40px; border-top: 1.5px solid rgba(255,255,255,0.1); padding-top: 30px;">
+          <p style="color: rgba(255,255,255,0.5); font-size: 14px;">You can also email us at <br> <strong style="color: var(--candy-yellow);">supportstorymagic.ai@gmail.com</strong></p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="pro-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="images/Logo.png" alt="StoryMagic Logo" class="footer-logo-img">
+        <p>Making learning to read a magical, unforgettable <br> experience through personalized AI stories.</p>
+        <div class="footer-socials">
+          <a href="https://www.instagram.com/storymagic_ai?igsh=amZ4OW9lZWNyd21r&amp;utm_source=qr" target="_blank" class="footer-social-btn social-instagram" title="Instagram">
+            <img src="images/instagram.webp" alt="Instagram" class="social-icon-img"/>
+          </a>
+          <a href="https://www.tiktok.com/@storymagic_ai?_r=1&amp;_t=ZS-95WrXclgNGr" target="_blank" class="footer-social-btn social-tiktok" title="TikTok">
+            <img src="images/tik tok.webp" alt="TikTok" class="social-icon-img"/>
+          </a>
+          <a href="https://www.youtube.com/@supportstorymagicai" target="_blank" class="footer-social-btn social-youtube" title="YouTube">
+            <img src="images/youtube.png" alt="YouTube" class="social-icon-img"/>
+          </a>
+          <a href="https://www.linkedin.com/in/storymagic-ai" class="footer-social-btn social-linkedin" title="LinkedIn">
+            <img src="images/linkedin.png" alt="LinkedIn" class="social-icon-img"/>
+          </a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="library.html">Library</a></li>
+            <li><a href="characters.html">Characters</a></li>
+            <li><a href="parent.html">Parents Dashboard</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="terms.html">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 StoryMagic AI by Nirumalar Santharan. All rights reserved. Created with ❤️ for young explorers.</p>
+    </div>
+  </footer>
+
+  <script src="auth.js"></script>
+  <script src="animations.js"></script>
+</body>
+</html>

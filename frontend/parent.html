@@ -1,0 +1,1035 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StoryMagic AI — Parent Dashboard</title>
+  <meta name="description" content="Track your child's reading progress, manage story history, and set parental controls."/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="animations.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    /* ── Access Denied Overlay ──────────────────────────── */
+    #accessDeniedOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(8, 5, 28, 0.97);
+      backdrop-filter: blur(20px);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 40px;
+      animation: fadeIn 0.4s ease;
+    }
+    #accessDeniedOverlay.visible {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    .denied-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 28px;
+      padding: 56px 48px;
+      max-width: 460px;
+      width: 100%;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+      animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+    .denied-icon {
+      font-size: 72px;
+      margin-bottom: 24px;
+      display: block;
+      animation: wobble 1s ease-in-out infinite alternate;
+    }
+    @keyframes wobble {
+      from { transform: rotate(-8deg); }
+      to   { transform: rotate(8deg); }
+    }
+    .denied-title {
+      font-family: var(--font-display, 'Bubblegum Sans', cursive);
+      font-size: 2rem;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+    .denied-title span {
+      background: linear-gradient(135deg, #a855f7, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .denied-msg {
+      color: rgba(255,255,255,0.55);
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.6;
+      margin-bottom: 36px;
+    }
+    .denied-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .denied-btn {
+      padding: 13px 28px;
+      border-radius: 14px;
+      border: none;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .denied-btn-primary {
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: #fff;
+      box-shadow: 0 6px 24px rgba(124,58,237,0.4);
+    }
+    .denied-btn-primary:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 10px 32px rgba(124,58,237,0.6);
+    }
+    .denied-btn-secondary {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.7);
+    }
+    .denied-btn-secondary:hover {
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    .denied-countdown {
+      font-size: 12px;
+      color: rgba(255,255,255,0.25);
+      margin-top: 24px;
+      font-weight: 500;
+    }
+    /* ── Parent name in dashboard header ─────────────────── */
+    #parentGreeting {
+      display: block;
+      font-size: 1rem;
+      color: rgba(255,255,255,0.5);
+      font-weight: 400;
+      margin-top: 8px;
+      font-family: var(--font-ui, sans-serif);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Layers -->
+  <div class="bg-stars"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Navigation Header -->
+  <nav class="nav-pill">
+    <a href="index.html" class="nav-pill-logo">
+      <img src="images/Logo.png" alt="StoryMagic Logo" class="nav-logo-img">
+    </a>
+    <div class="nav-pill-links">
+      <a href="index.html">Home</a>
+      <a href="characters.html">Characters</a>
+      <a href="parent.html">Parents</a>
+    </div>
+    <div class="nav-pill-auth">
+      <!-- Logic in auth.js will fill this -->
+    </div>
+  </nav>
+
+  <!-- Access Denied Overlay (shown to non-parents) -->
+  <div id="accessDeniedOverlay" role="alertdialog" aria-modal="true" aria-labelledby="deniedTitle">
+    <div class="denied-card">
+      <span class="denied-icon">🔐</span>
+      <h2 class="denied-title" id="deniedTitle">Parents <span>Only!</span></h2>
+      <p class="denied-msg">
+        This dashboard is reserved for parents.<br>
+        Please sign in with a <strong style="color:#c4b5fd;">Parent account</strong> to access child progress, settings, and controls.
+      </p>
+      <div class="denied-btns">
+        <a href="login.html" class="denied-btn denied-btn-primary">🛡️ Parent Login</a>
+        <a href="index.html" class="denied-btn denied-btn-secondary">Go Home</a>
+      </div>
+      <p class="denied-countdown" id="deniedCountdown"></p>
+    </div>
+  </div>
+
+  <main class="page-wrapper">
+
+    <!-- ── Dashboard Header ─────────────────────────────── -->
+    <div class="dash-header-wrap">
+      <div class="dash-header-card">
+        <div class="dash-profile-row">
+          <div class="dash-avatar" id="dashAvatar">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <div>
+            <h1 class="dash-title">Parent <span>Dashboard</span></h1>
+            <span id="parentGreeting" class="dash-greeting"></span>
+          </div>
+        </div>
+        <div class="dash-tabs-row">
+          <button class="dash-tab active" data-tab="overview"    onclick="switchTab('overview',this)">
+            <i class="fa-solid fa-chart-pie"></i> Overview
+          </button>
+          <button class="dash-tab" data-tab="reading-log"        onclick="switchTab('reading-log',this)">
+            <i class="fa-solid fa-list"></i> Reading Log
+          </button>
+          <button class="dash-tab" data-tab="settings"           onclick="switchTab('settings',this)">
+            <i class="fa-solid fa-sliders"></i> Settings
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TAB: OVERVIEW ══════════════════════════════════ -->
+    <div id="tab-overview">
+
+      <!-- Stat Cards -->
+      <div class="dash-stats-row">
+        <div class="dash-stat-card" style="--sc:#fbbf24;">
+          <div class="dash-stat-icon"><i class="fa-solid fa-book-open"></i></div>
+          <div class="dash-stat-num" id="statStories">0</div>
+          <div class="dash-stat-label">Stories Read</div>
+        </div>
+        <div class="dash-stat-card" style="--sc:#0ea5e9;">
+          <div class="dash-stat-icon"><i class="fa-solid fa-clock"></i></div>
+          <div class="dash-stat-num" id="statTime">0m</div>
+          <div class="dash-stat-label">Reading Time</div>
+        </div>
+        <div class="dash-stat-card" style="--sc:#ec4899;">
+          <div class="dash-stat-icon"><i class="fa-solid fa-star"></i></div>
+          <div class="dash-stat-num" id="statChoices">0</div>
+          <div class="dash-stat-label">Choices Made</div>
+        </div>
+      </div>
+
+      <div class="dash-panels-col">
+        <!-- Reading Streak -->
+        <div class="glass-panel dash-panel">
+          <div class="streak-header-row">
+            <div>
+              <h2 class="dash-section-title">Reading Streak</h2>
+              <p class="dash-section-sub">Last 28 days</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span class="dash-streak-badge" id="streakCount">0 days</span>
+              <button onclick="resetProgress()" class="streak-reset-btn">Reset</button>
+            </div>
+          </div>
+          <div class="streak-grid" id="streakCalendar"></div>
+          <div class="dash-streak-legend">
+            <span><span class="legend-dot" style="background:#22c55e;"></span> Read</span>
+            <span><span class="legend-dot" style="background:rgba(255,255,255,0.18);"></span> Missed</span>
+          </div>
+        </div>
+
+        <!-- Recent Adventures -->
+        <div class="glass-panel dash-panel">
+          <h2 class="dash-section-title" style="margin-bottom:20px;">Recent Adventures</h2>
+          <div class="history-list" id="historyList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TAB: READING LOG ═══════════════════════════════ -->
+    <div id="tab-reading-log" style="display:none;">
+      <div class="dash-tab-inner">
+        <div class="glass-panel dash-panel">
+          <h2 class="dash-section-title" style="margin-bottom:20px;">Full Reading Log</h2>
+          <div style="overflow-x:auto;">
+            <table id="logTable" class="dash-log-table">
+              <thead>
+                <tr>
+                  <th>Story</th>
+                  <th>Theme</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Quiz</th>
+                  <th>Feeling</th>
+                </tr>
+              </thead>
+              <tbody id="logTableBody">
+                <tr><td colspan="6" style="text-align:center;padding:40px;color:rgba(255,255,255,0.35);">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TAB: SETTINGS ══════════════════════════════════ -->
+    <div id="tab-settings" style="display:none;">
+      <div class="dash-tab-inner dash-settings-col">
+
+        <!-- Weekly Reading Goal -->
+        <div class="glass-panel dash-panel">
+          <h2 class="dash-section-title" style="margin-bottom:6px;">Weekly Reading Goal</h2>
+          <p class="dash-panel-desc">Set how many stories your child should read each week.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+            <button class="goal-btn" data-goal="1" onclick="setGoal(1,this)">1 story</button>
+            <button class="goal-btn" data-goal="3" onclick="setGoal(3,this)">3 stories</button>
+            <button class="goal-btn" data-goal="5" onclick="setGoal(5,this)">5 stories</button>
+            <button class="goal-btn" data-goal="7" onclick="setGoal(7,this)">7 stories</button>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+              <span style="font-size:13px;color:rgba(255,255,255,0.55);">This week's progress</span>
+              <span id="goalProgressLabel" style="font-size:13px;font-weight:700;color:#22c55e;">0 / 3 stories</span>
+            </div>
+            <div style="background:rgba(255,255,255,0.08);border-radius:50px;height:10px;overflow:hidden;">
+              <div id="goalProgressBar" style="height:100%;background:linear-gradient(90deg,#22c55e,#16a34a);border-radius:50px;width:0%;transition:width 0.6s ease;"></div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="glass-panel dash-panel">
+          <h2 class="dash-section-title" style="margin-bottom:20px;">Reading Controls</h2>
+          <div class="dash-controls-list">
+            <div class="dash-control-row">
+              <div>
+                <strong>Daily Time Limit</strong>
+                <small>Stop reading after 1 hour</small>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span id="timeLimitBadge" style="display:none;font-size:11px;font-weight:800;color:#22c55e;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);padding:3px 10px;border-radius:50px;letter-spacing:0.5px;">Enabled</span>
+                <label class="toggle">
+                  <input type="checkbox" id="timeLimitToggle" onchange="saveToggle('timeLimit',this.checked); updateBadge('timeLimitBadge', this.checked)"/>
+                  <div class="toggle-track"></div>
+                </label>
+              </div>
+            </div>
+            <div class="dash-control-row">
+              <div>
+                <strong>Auto-Narration</strong>
+                <small>Read story aloud automatically</small>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span id="autoNarrBadge" style="display:none;font-size:11px;font-weight:800;color:#22c55e;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);padding:3px 10px;border-radius:50px;letter-spacing:0.5px;">Enabled</span>
+                <label class="toggle">
+                  <input type="checkbox" id="autoNarrateToggle" onchange="saveToggle('autoNarrate',this.checked); updateBadge('autoNarrBadge', this.checked)"/>
+                  <div class="toggle-track"></div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn dreamy-btn-pink jelly-hover" onclick="saveAllSettings()" style="align-self:center;padding:14px 48px;font-size:1rem;">
+          Save Settings
+        </button>
+
+      </div>
+    </div>
+
+  </main>
+
+  <style>
+    /* ── Dashboard header card ───────────────────────────── */
+    .dash-header-wrap { max-width:1040px; margin:80px auto 0; padding:24px 24px 0; }
+    .dash-header-card {
+      background: rgba(8,4,28,0.75);
+      backdrop-filter: blur(24px);
+      border: 1.5px solid rgba(168,85,247,0.3);
+      border-radius: 28px;
+      padding: 28px 32px 0;
+      box-shadow: 0 0 80px rgba(168,85,247,0.12), 0 24px 48px rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
+    }
+    .dash-header-card::before {
+      content: '';
+      position: absolute; top: 0; left: 8%; right: 8%; height: 1.5px;
+      background: linear-gradient(90deg, transparent, rgba(168,85,247,0.7), rgba(236,72,153,0.7), transparent);
+    }
+    .dash-profile-row {
+      display: flex; align-items: center; gap: 18px; margin-bottom: 24px;
+    }
+    .dash-avatar {
+      width: 60px; height: 60px; border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed, #ec4899);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; color: #fff; flex-shrink: 0;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(124,58,237,0.5);
+    }
+    .dash-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .dash-title {
+      font-family: var(--font-display);
+      font-size: 1.9rem; color: #fff; margin: 0 0 4px; line-height: 1.1;
+    }
+    .dash-title span { color: #ec4899; }
+    .dash-greeting {
+      display: block; font-size: 0.95rem;
+      color: rgba(255,255,255,0.5); font-weight: 400;
+      font-family: var(--font-ui, sans-serif);
+    }
+
+    /* ── Tabs ──────────────────────────────────────────────── */
+    .dash-tabs-row {
+      display: flex; gap: 4px; border-top: 1px solid rgba(255,255,255,0.08);
+      margin: 0 -32px; padding: 0 32px;
+    }
+    .dash-tab {
+      padding: 14px 22px;
+      border: none; border-bottom: 3px solid transparent;
+      background: transparent;
+      color: rgba(255,255,255,0.45);
+      font-size: 14px; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; gap: 8px;
+      transition: all 0.2s ease;
+      border-radius: 0;
+    }
+    .dash-tab:hover { color: rgba(255,255,255,0.8); }
+    .dash-tab.active {
+      color: #fff;
+      border-bottom-color: #ec4899;
+      background: rgba(236,72,153,0.06);
+    }
+
+    /* ── Stat cards ────────────────────────────────────────── */
+    .dash-stats-row {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 20px; max-width: 1040px; margin: 24px auto 0; padding: 0 24px;
+    }
+    .dash-stat-card {
+      background: rgba(8,4,28,0.75);
+      backdrop-filter: blur(20px);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-top: 3px solid var(--sc);
+      border-radius: 20px;
+      padding: 24px 28px;
+      display: flex; align-items: center; gap: 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      transition: transform 0.2s ease;
+    }
+    .dash-stat-card:hover { transform: translateY(-4px); }
+    .dash-stat-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: color-mix(in srgb, var(--sc) 15%, transparent);
+      border: 1.5px solid color-mix(in srgb, var(--sc) 40%, transparent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; color: var(--sc); flex-shrink: 0;
+    }
+    .dash-stat-num {
+      font-size: 2.2rem; font-weight: 800;
+      color: var(--sc); line-height: 1;
+      margin-bottom: 4px;
+    }
+    .dash-stat-label {
+      font-size: 13px; color: rgba(255,255,255,0.5);
+      font-weight: 600; font-family: var(--font-ui,sans-serif);
+    }
+
+    /* ── Inner panels ──────────────────────────────────────── */
+    .dash-panels-col {
+      display: flex; flex-direction: column; gap: 24px;
+      max-width: 1040px; margin: 24px auto 0; padding: 0 24px 60px;
+    }
+    .dash-panel {
+      padding: 28px 32px;
+      background: rgba(5, 2, 20, 0.72) !important;
+      backdrop-filter: blur(28px) !important;
+      border: 1.5px solid rgba(255,255,255,0.1) !important;
+    }
+
+    /* ── Section titles (no icons) ─────────────────────────── */
+    .dash-section-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem; font-weight: 800;
+      color: #fff; margin: 0;
+      letter-spacing: 0.3px;
+    }
+    .dash-section-sub {
+      font-size: 12px; color: rgba(255,255,255,0.4);
+      font-weight: 600; margin: 4px 0 0; letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    /* ── Streak header ─────────────────────────────────────── */
+    .streak-header-row {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 20px;
+    }
+    .dash-streak-badge {
+      background: rgba(251,191,36,0.12);
+      border: 1.5px solid rgba(251,191,36,0.35);
+      color: #fbbf24; font-size: 13px; font-weight: 800;
+      padding: 5px 16px; border-radius: 50px;
+    }
+    .streak-reset-btn {
+      padding: 5px 16px; border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 50px; background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.45); font-size: 12px; font-weight: 700;
+      cursor: pointer; font-family: inherit; transition: all 0.2s;
+    }
+    .streak-reset-btn:hover { color: #f87171; border-color: rgba(248,113,113,0.4); }
+
+    .dash-streak-legend {
+      display: flex; gap: 20px; margin-top: 16px;
+      font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 600;
+      align-items: center;
+    }
+    .legend-dot {
+      display: inline-block; width: 10px; height: 10px;
+      border-radius: 3px; margin-right: 6px; vertical-align: middle;
+    }
+    .dash-panel-desc {
+      color: rgba(255,255,255,0.5); font-size: 14px; margin-bottom: 18px; margin-top: -10px;
+    }
+
+    /* ── Tab inner wrappers ─────────────────────────────────── */
+    .dash-tab-inner {
+      max-width: 1040px; margin: 24px auto 0; padding: 0 24px 60px;
+    }
+    .dash-settings-col { display: flex; flex-direction: column; gap: 20px; max-width: 720px; }
+
+    /* ── Log table ─────────────────────────────────────────── */
+    .dash-log-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .dash-log-table thead tr { border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .dash-log-table th {
+      text-align: left; padding: 10px 16px;
+      color: rgba(255,255,255,0.4); font-weight: 700;
+      font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+    }
+    .dash-log-table tbody tr { border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.15s; }
+    .dash-log-table tbody tr:hover { background: rgba(255,255,255,0.04); }
+    .dash-log-table td { padding: 14px 16px; color: rgba(255,255,255,0.8); vertical-align: middle; }
+
+    /* ── Settings ──────────────────────────────────────────── */
+    .setting-age-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 11px 22px; border-radius: 50px;
+      border: 1.5px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .setting-age-btn:has(input:checked) {
+      background: rgba(168,85,247,0.2); border-color: #a855f7; color: #fff;
+      box-shadow: 0 4px 16px rgba(168,85,247,0.3);
+    }
+    .theme-toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; border-radius: 14px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    }
+    .theme-toggle-row span { font-size: 14px; color: rgba(255,255,255,0.75); font-weight: 600; }
+    .dash-controls-list { display: flex; flex-direction: column; gap: 20px; }
+    .dash-control-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px; border-radius: 14px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+    }
+    .dash-control-row strong { display: block; color: #fff; margin-bottom: 3px; font-size: 15px; }
+    .dash-control-row small { color: rgba(255,255,255,0.45); font-size: 13px; }
+    .goal-btn {
+      padding: 10px 22px; border-radius: 50px;
+      border: 1.5px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 700;
+      cursor: pointer; font-family: inherit; transition: all 0.2s;
+    }
+    .goal-btn.active { background: rgba(34,197,94,0.2); border-color: #22c55e; color: #fff; box-shadow: 0 4px 16px rgba(34,197,94,0.3); }
+    .goal-btn:hover:not(.active) { background: rgba(255,255,255,0.1); color: #fff; }
+
+    /* ── Reading streak redesign ───────────────────────────── */
+    .streak-grid {
+      display: grid;
+      grid-template-columns: repeat(28, 1fr);
+      gap: 5px;
+      margin-bottom: 14px;
+    }
+    .streak-cell {
+      aspect-ratio: 1;
+      border-radius: 6px;
+      transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
+      cursor: default;
+    }
+    .streak-cell:hover { transform: scale(1.35); z-index: 2; }
+    .streak-cell.read {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      box-shadow: 0 2px 8px rgba(34,197,94,0.45);
+    }
+    .streak-cell.today-read {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      box-shadow: 0 0 12px rgba(34,197,94,0.7), 0 0 24px rgba(34,197,94,0.3);
+      animation: todayPulse 2s ease-in-out infinite;
+    }
+    .streak-cell.missed { background: rgba(255,255,255,0.07); }
+    .streak-cell.today-missed {
+      background: rgba(255,255,255,0.12);
+      border: 1.5px solid rgba(255,255,255,0.25);
+    }
+    @keyframes todayPulse {
+      0%,100% { box-shadow: 0 0 12px rgba(34,197,94,0.7); }
+      50%      { box-shadow: 0 0 20px rgba(34,197,94,0.95), 0 0 40px rgba(34,197,94,0.4); }
+    }
+    .streak-week-labels {
+      display: grid; grid-template-columns: repeat(4, 7fr);
+      gap: 5px; margin-bottom: 6px;
+    }
+    .streak-week-label {
+      grid-column: span 7;
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      color: rgba(255,255,255,0.25); text-align: left;
+      text-transform: uppercase;
+    }
+
+    /* ── History rows ──────────────────────────────────────── */
+    .history-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      transition: all 0.22s ease;
+      margin-bottom: 10px;
+    }
+    .history-row:last-child { margin-bottom: 0; }
+    .history-row:hover { background: rgba(255,255,255,0.08); transform: translateX(4px); }
+    .history-theme-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    }
+    .history-title {
+      font-weight: 700; color: #fff; font-size: 15px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .history-meta {
+      font-size: 12px; color: rgba(255,255,255,0.38);
+      margin-top: 3px; font-weight: 500;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .history-theme-pill {
+      display: inline-block; font-size: 11px; font-weight: 700;
+      padding: 2px 10px; border-radius: 50px;
+      border: 1px solid; opacity: 0.85;
+    }
+    .history-date {
+      font-size: 12px; font-weight: 700;
+      color: rgba(255,255,255,0.3); white-space: nowrap; flex-shrink: 0;
+      background: rgba(255,255,255,0.06);
+      padding: 4px 10px; border-radius: 50px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+  </style>
+
+  <!-- Global Footer -->
+  <footer class="pro-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="images/Logo.png" alt="StoryMagic Logo" class="footer-logo-img">
+        <p>Making learning to read a magical, unforgettable <br> experience through personalized AI stories.</p>
+        <div class="footer-socials">
+          <a href="https://www.instagram.com/storymagic_ai?igsh=amZ4OW9lZWNyd21r&amp;utm_source=qr" target="_blank" class="footer-social-btn social-instagram" title="Instagram">
+            <img src="images/instagram.webp" alt="Instagram" class="social-icon-img"/>
+          </a>
+          <a href="https://www.tiktok.com/@storymagic_ai?_r=1&amp;_t=ZS-95WrXclgNGr" target="_blank" class="footer-social-btn social-tiktok" title="TikTok">
+            <img src="images/tik tok.webp" alt="TikTok" class="social-icon-img"/>
+          </a>
+          <a href="https://www.youtube.com/@supportstorymagicai" target="_blank" class="footer-social-btn social-youtube" title="YouTube">
+            <img src="images/youtube.png" alt="YouTube" class="social-icon-img"/>
+          </a>
+          <a href="https://www.linkedin.com/in/storymagic-ai" class="footer-social-btn social-linkedin" title="LinkedIn">
+            <img src="images/linkedin.png" alt="LinkedIn" class="social-icon-img"/>
+          </a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="library.html">Library</a></li>
+            <li><a href="characters.html">Characters</a></li>
+            <li><a href="parent.html">Parents Dashboard</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="terms.html">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 StoryMagic AI by Nirumalar Santharan. All rights reserved. Created with ❤️ for young explorers.</p>
+    </div>
+  </footer>
+
+  <script src="auth.js"></script>
+  <script type="module" src="firebase-db.js"></script>
+  <script>
+    /* ── Guard: parent-only access ───────────────────────── */
+    (function checkAccess() {
+      const user = getCurrentUser();
+      if (!user || user.role !== 'parent') {
+        // Show overlay immediately
+        const overlay = document.getElementById('accessDeniedOverlay');
+        overlay.classList.add('visible');
+
+        // Auto-redirect countdown
+        let secs = 5;
+        const countEl = document.getElementById('deniedCountdown');
+        countEl.textContent = `Redirecting to login in ${secs}s…`;
+        const timer = setInterval(() => {
+          secs--;
+          if (secs <= 0) {
+            clearInterval(timer);
+            window.location.href = 'login.html';
+          } else {
+            countEl.textContent = `Redirecting to login in ${secs}s…`;
+          }
+        }, 1000);
+      } else {
+        // Show personalised greeting
+        const greetEl = document.getElementById('parentGreeting');
+        if (greetEl) {
+          const hour = new Date().getHours();
+          const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+          greetEl.textContent = `${greeting}, ${user.name}!`;
+          if (user.avatar) {
+            const av = document.getElementById('dashAvatar');
+            if (av) av.innerHTML = `<img src="${user.avatar}" alt="Avatar">`;
+          }
+        }
+      }
+    })();
+
+    /* ── Build Streak Calendar ───────────────────────────── */
+    function buildCalendar(readDayOffsets) {
+      const cal = document.getElementById('streakCalendar');
+      cal.className = 'streak-grid';
+      cal.innerHTML = '';
+      const readDays = new Set(readDayOffsets);
+      for (let i = 27; i >= 0; i--) {
+        const d = document.createElement('div');
+        const read = readDays.has(i);
+        const isToday = i === 0;
+        if (isToday)  d.className = `streak-cell ${read ? 'today-read' : 'today-missed'}`;
+        else          d.className = `streak-cell ${read ? 'read' : 'missed'}`;
+        const date = new Date(); date.setDate(date.getDate() - i);
+        d.title = isToday ? 'Today' : date.toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short'});
+        cal.appendChild(d);
+      }
+    }
+
+    /* ── Story History ────────────────────────────────────── */
+    const themeAccents = { forest:'#22c55e', ocean:'#0ea5e9', dinosaur:'#f97316', mystery:'#7c3aed', kindness:'#ec4899', moral:'#f59e0b' };
+
+    function buildHistory(sessions) {
+      const list = document.getElementById('historyList');
+      list.innerHTML = '';
+      if (!sessions.length) {
+        list.innerHTML = `<div style="text-align:center;padding:40px 24px;">
+          <i class="fa-solid fa-book-open" style="font-size:36px;color:rgba(255,255,255,0.12);margin-bottom:12px;display:block;"></i>
+          <p style="color:rgba(255,255,255,0.3);font-size:14px;margin:0;">No adventures yet — stories will appear here after reading.</p>
+        </div>`;
+        return;
+      }
+      sessions.slice(0, 10).forEach(item => {
+        const accent = themeAccents[item.theme] || '#a855f7';
+        const diffDays = Math.floor((Date.now() - new Date(item.completedAt)) / 86400000);
+        const dateLabel = diffDays === 0 ? 'Today' : diffDays === 1 ? 'Yesterday' : `${diffDays}d ago`;
+        const mins = item.readingTimeSecs ? Math.round(item.readingTimeSecs/60) + ' min' : null;
+        const themeName = item.theme ? item.theme.charAt(0).toUpperCase()+item.theme.slice(1) : '';
+        const el = document.createElement('div');
+        el.className = 'history-row';
+        el.innerHTML = `
+          <div class="history-theme-dot" style="background:${accent};box-shadow:0 0 8px ${accent}88;"></div>
+          <div style="min-width:0;">
+            <div class="history-title">${item.title || 'Untitled Story'}</div>
+            <div class="history-meta">
+              <span class="history-theme-pill" style="color:${accent};border-color:${accent}44;background:${accent}11;">${themeName}</span>
+              ${mins ? `<span><i class="fa-regular fa-clock" style="margin-right:3px;"></i>${mins}</span>` : ''}
+            </div>
+          </div>
+          <span class="history-date">${dateLabel}</span>`;
+        list.appendChild(el);
+      });
+    }
+
+    /* ── Animate stat numbers ────────────────────────────── */
+    function animateCount(el, target, suffix = '') {
+      let n = 0;
+      const step = Math.ceil(target / 30);
+      const iv = setInterval(() => {
+        n = Math.min(n + step, target);
+        el.textContent = n + suffix;
+        if (n >= target) clearInterval(iv);
+      }, 40);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      buildCalendar([]);
+      buildHistory([]);
+      buildLogTable([]);
+      restoreSettings();
+      restoreGoal();
+      loadChildProfile();
+
+      setTimeout(async () => {
+        // Retry until Firebase module is ready
+        let retries = 0;
+        while (typeof window.getStats !== 'function' && retries < 10) {
+          await new Promise(r => setTimeout(r, 200));
+          retries++;
+        }
+        if (typeof window.getStats !== 'function') return;
+        const { totalStories, totalTimeMins, totalChoices, sessions } = await window.getStats();
+
+        animateCount(document.getElementById('statStories'), totalStories);
+        animateCount(document.getElementById('statTime'), totalTimeMins, 'm');
+        animateCount(document.getElementById('statChoices'), totalChoices);
+
+        // Compute which of the last 28 days had a session (0 = today)
+        const now = Date.now();
+        const readDayOffsets = [...new Set(
+          sessions
+            .map(s => Math.floor((now - new Date(s.completedAt)) / 86400000))
+            .filter(d => d >= 0 && d < 28)
+        )];
+        buildCalendar(readDayOffsets);
+        buildHistory(sessions);
+        buildLogTable(sessions);
+
+        // Calculate consecutive reading streak from today backwards
+        const daySet = new Set(readDayOffsets);
+        let streak = 0;
+        for (let i = 0; i < 28; i++) {
+          if (daySet.has(i)) streak++;
+          else break;
+        }
+        document.getElementById('streakCount').textContent = `${streak} day${streak !== 1 ? 's' : ''}`;
+      }, 400);
+    });
+
+    async function resetProgress() {
+      if (!confirm('Reset ALL reading data? This permanently deletes stories history, streaks, badges and saved stories.')) return;
+
+      const btn = event.target;
+      btn.textContent = 'Resetting…';
+      btn.disabled = true;
+
+      // 1. Delete Firebase reading sessions
+      if (typeof window.deleteAllSessions === 'function') {
+        await window.deleteAllSessions();
+      }
+
+      // 2. Clear all relevant localStorage keys
+      ['readerStats','earnedBadges','savedStories','setting_weeklyGoal'].forEach(k => localStorage.removeItem(k));
+
+      // 3. Reset all displayed UI
+      buildCalendar([]);
+      buildHistory([]);
+      buildLogTable([]);
+      ['statStories','statTime','statChoices'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = id === 'statTime' ? '0m' : '0';
+      });
+      document.getElementById('streakCount').textContent = '0 days';
+      updateGoalProgress(parseInt(localStorage.getItem('setting_weeklyGoal') || '3'));
+
+      btn.textContent = 'Reset';
+      btn.disabled = false;
+    }
+
+    function setGoal(n, btn) {
+      localStorage.setItem('setting_weeklyGoal', n);
+      document.querySelectorAll('.goal-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateGoalProgress(n);
+    }
+    async function updateGoalProgress(goal) {
+      let done = 0;
+      try {
+        if (typeof window.getReadingSessions === 'function') {
+          const sessions = await window.getReadingSessions();
+          // Count sessions from this week (Monday 00:00 onwards)
+          const now = new Date();
+          const dayOfWeek = now.getDay();
+          const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+          const monday = new Date(now);
+          monday.setDate(now.getDate() + diffToMonday);
+          monday.setHours(0, 0, 0, 0);
+          done = sessions.filter(s => s.completedAt && new Date(s.completedAt) >= monday).length;
+        }
+      } catch(e) { done = 0; }
+      done = Math.min(done, goal);
+      const pct = goal > 0 ? Math.round((done / goal) * 100) : 0;
+      document.getElementById('goalProgressLabel').textContent = `${done} / ${goal} stories`;
+      document.getElementById('goalProgressBar').style.width = pct + '%';
+    }
+    async function restoreGoal() {
+      const saved = parseInt(localStorage.getItem('setting_weeklyGoal') || '3');
+      document.querySelectorAll('.goal-btn').forEach(b => {
+        if (parseInt(b.dataset.goal) === saved) b.classList.add('active');
+      });
+      await updateGoalProgress(saved);
+    }
+    function loadChildProfile() {
+      const childNameInput = document.getElementById('childNameInput');
+      const saved = localStorage.getItem('setting_linkedChildName') || localStorage.getItem('setting_weeklyGoal') && '';
+      const cu = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      if (childNameInput && cu.name) childNameInput.placeholder = cu.name;
+      const av = document.getElementById('childAvatarThumb');
+      if (av && cu.avatar) av.innerHTML = `<img src="${cu.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    }
+
+    function saveToggle(key, value) {
+      localStorage.setItem('ctrl_' + key, value ? '1' : '0');
+    }
+
+    /* ── Tab switcher ────────────────────────────────────── */
+    function switchTab(tabName, btn) {
+      ['overview', 'reading-log', 'settings'].forEach(t => {
+        document.getElementById('tab-' + t).style.display = t === tabName ? '' : 'none';
+      });
+      document.querySelectorAll('.dash-tab').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+
+    /* ── Build Reading Log table ─────────────────────────── */
+    function buildLogTable(sessions) {
+      const tbody = document.getElementById('logTableBody');
+      if (!sessions || !sessions.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:rgba(255,255,255,0.35);">No reading sessions yet — stories will appear here!</td></tr>';
+        return;
+      }
+      tbody.innerHTML = sessions.map(s => {
+        const date  = s.completedAt ? new Date(s.completedAt).toLocaleDateString() : '—';
+        const time  = s.readingTimeSecs ? Math.round(s.readingTimeSecs / 60) + ' min' : (s.durationMins != null ? s.durationMins + ' min' : '—');
+        const quiz  = s.quizPassed ? 'Passed' : (s.quizScore != null ? s.quizScore + '/5' : '—');
+        const feel  = s.emotion || s.feeling || '—';
+        return `<tr>
+          <td><strong style="color:#fff">${s.title || 'Untitled Story'}</strong></td>
+          <td>${s.theme ? s.theme.charAt(0).toUpperCase() + s.theme.slice(1) : '—'}</td>
+          <td>${date}</td>
+          <td>${time}</td>
+          <td>${quiz}</td>
+          <td style="font-size:20px">${feel}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    /* ── Build theme restriction checkboxes ──────────────── */
+    function buildThemeToggles() {
+      const themes = [
+        { key:'forest',   label:'🌴 Forest Adventure' },
+        { key:'space',    label:'🚀 Space Explorer'   },
+        { key:'ocean',    label:'🌊 Ocean Voyage'     },
+        { key:'dinosaur', label:'🦕 Dinosaur World'   },
+        { key:'kindness', label:'🧚 Kindness Kingdom' },
+        { key:'land',     label:'🌍 Land of Wonders'  },
+      ];
+      const blocked = JSON.parse(localStorage.getItem('blockedThemes') || '[]');
+      const wrap = document.getElementById('themeToggles');
+      wrap.innerHTML = themes.map(t => `
+        <div class="theme-toggle-row">
+          <span>${t.label}</span>
+          <input type="checkbox" ${blocked.includes(t.key) ? 'checked' : ''}
+            onchange="toggleTheme('${t.key}',this.checked)"
+            style="width:18px;height:18px;cursor:pointer;accent-color:#a855f7;">
+        </div>
+      `).join('');
+    }
+
+    /* ── Toggle a blocked theme ──────────────────────────── */
+    function toggleTheme(key, isBlocked) {
+      let list = JSON.parse(localStorage.getItem('blockedThemes') || '[]');
+      if (isBlocked) { if (!list.includes(key)) list.push(key); }
+      else { list = list.filter(k => k !== key); }
+      localStorage.setItem('blockedThemes', JSON.stringify(list));
+    }
+
+    /* ── Save individual setting ─────────────────────────── */
+    function updateBadge(id, on) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = on ? 'inline-block' : 'none';
+    }
+
+    function saveSetting(key, value) {
+      localStorage.setItem('setting_' + key, value);
+    }
+
+    /* ── Save all settings → localStorage + Firebase ────────── */
+    async function saveAllSettings() {
+      const timeLimitOn = document.getElementById('timeLimitToggle').checked;
+      const autoNarrOn  = document.getElementById('autoNarrateToggle').checked;
+      const childName   = document.getElementById('childNameInput')?.value.trim() || '';
+      const weeklyGoal  = parseInt(localStorage.getItem('setting_weeklyGoal') || '3');
+
+      localStorage.setItem('setting_timeLimit',   timeLimitOn ? '1' : '0');
+      localStorage.setItem('setting_autoNarrate', autoNarrOn  ? '1' : '0');
+      if (childName) localStorage.setItem('setting_childName', childName);
+
+      if (typeof window.saveUserSettings === 'function') {
+        await window.saveUserSettings({ timeLimitOn, autoNarrOn, childName, weeklyGoal });
+      }
+
+      let toast = document.getElementById('settingsToast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'settingsToast';
+        toast.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;padding:14px 28px;border-radius:50px;font-weight:700;font-size:15px;box-shadow:0 8px 32px rgba(124,58,237,0.5);z-index:9000;transition:opacity 0.4s ease;pointer-events:none;';
+        document.body.appendChild(toast);
+      }
+      toast.textContent = 'Settings saved!';
+      toast.style.opacity = '1';
+      clearTimeout(toast._hide);
+      toast._hide = setTimeout(() => {
+        toast.style.opacity = '0';
+        ['overview', 'reading-log', 'settings'].forEach(t => {
+          const panel = document.getElementById('tab-' + t);
+          if (panel) panel.style.display = t === 'overview' ? '' : 'none';
+        });
+        document.querySelectorAll('.dash-tab').forEach(b => {
+          b.classList.toggle('active', b.dataset.tab === 'overview');
+        });
+      }, 1200);
+    }
+
+    /* ── Restore settings from Firebase → localStorage ──────── */
+    async function restoreSettings() {
+      if (typeof window.getUserSettings === 'function') {
+        const s = await window.getUserSettings();
+        if (s.timeLimitOn  !== undefined) localStorage.setItem('setting_timeLimit',   s.timeLimitOn  ? '1' : '0');
+        if (s.autoNarrOn   !== undefined) localStorage.setItem('setting_autoNarrate', s.autoNarrOn   ? '1' : '0');
+        if (s.childName)                  localStorage.setItem('setting_childName',   s.childName);
+        if (s.weeklyGoal)                 localStorage.setItem('setting_weeklyGoal',  s.weeklyGoal);
+      }
+      const tl = localStorage.getItem('setting_timeLimit');
+      const an = localStorage.getItem('setting_autoNarrate');
+      if (tl !== null) { document.getElementById('timeLimitToggle').checked   = tl === '1'; updateBadge('timeLimitBadge', tl === '1'); }
+      if (an !== null) { document.getElementById('autoNarrateToggle').checked = an === '1'; updateBadge('autoNarrBadge', an === '1'); }
+      const inp = document.getElementById('childNameInput');
+      const cn  = localStorage.getItem('setting_childName');
+      if (inp && cn) inp.value = cn;
+    }
+  </script>
+</body>
+</html>

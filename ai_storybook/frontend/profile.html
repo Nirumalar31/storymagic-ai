@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My profile — StoryMagic AI</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    .avatar-upload-wrap {
+      width: 140px;
+      height: 140px;
+      position: relative;
+      margin: 0 auto 30px;
+    }
+    .profile-avatar-large {
+      width: 100%;
+      height: 100%;
+      border-radius: 30px;
+      object-fit: cover;
+      border: 4px solid var(--candy-yellow);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .badge-camera {
+      position: absolute;
+      bottom: -10px;
+      right: -10px;
+      background: var(--candy-pink);
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 3px solid #fff;
+    }
+    .avatar-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .avatar-opt {
+      width: 100%;
+      aspect-ratio: 1/1;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+    .avatar-opt img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-opt.selected { border-color: var(--candy-yellow); transform: scale(1.1); box-shadow: 0 0 15px var(--candy-yellow); }
+  </style>
+</head>
+<body>
+
+  <!-- Background Layers -->
+  <div class="bg-stars"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Navigation Header -->
+  <nav class="nav-pill">
+    <a href="index.html" class="nav-pill-logo">
+      <img src="images/Logo.png" alt="StoryMagic Logo" class="nav-logo-img">
+    </a>
+    <div class="nav-pill-links">
+      <a href="index.html">Home</a>
+      <a href="characters.html">Characters</a>
+      <a href="parent.html">Parents</a>
+    </div>
+    <div class="nav-pill-auth">
+      <!-- Logic in auth.js will fill this -->
+    </div>
+  </nav>
+
+  <main class="page-wrapper">
+    <div class="profile-layout" style="max-width: 600px; margin: 40px auto; padding: 0 24px; width: 100%;">
+      
+      <div class="glass-panel" style="text-align: center;">
+        <h1 class="dreamy-title" style="font-size: 2.2rem; margin-bottom: 30px;">My Magic <span>Profile</span></h1>
+        
+        <div class="avatar-upload-wrap">
+          <img src="images/Rosie.webp" alt="My Avatar" id="avatarPreview" class="profile-avatar-large">
+          <label for="avatarUpload" class="badge-camera">
+             <i class="fas fa-camera"></i>
+          </label>
+          <input type="file" id="avatarUpload" hidden accept="image/*" onchange="previewFile()">
+        </div>
+
+        <div style="text-align: left; margin-bottom: 30px;">
+          <label class="form-label" style="display: block; margin-bottom: 8px; font-weight: 500;">Magical Name:</label>
+          <input type="text" id="userName" class="form-input" style="background: rgba(255,255,255,0.05);" placeholder="Enter your name">
+        </div>
+
+        <div style="text-align: left; margin-bottom: 30px;">
+          <label class="form-label" style="display: block; margin-bottom: 8px; font-weight: 500;">Choose a Buddy:</label>
+          <div class="avatar-grid" id="avatarGallery"></div>
+        </div>
+
+        <div style="display: flex; gap: 16px; margin-top: 40px;">
+          <button class="btn dreamy-btn-pink jelly-hover" style="flex: 2;" onclick="saveProfile()">Save Changes ✨</button>
+          <button class="btn dreamy-btn-purple jelly-hover" style="flex: 1;" onclick="logout()">Logout</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="pro-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="images/Logo.png" alt="StoryMagic Logo" class="footer-logo-img">
+        <p>Creating magical moments for every small explorer.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Links</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="characters.html">Characters</a></li>
+            <li><a href="parent.html">Parents Dashboard</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="auth.js"></script>
+  <script>
+    const AVATARS = [
+      'images/Luna.webp', 'images/Sparky.webp', 'images/Max.webp',
+      'images/Rosie.webp', 'images/Willow.webp', 'images/Dino.webp'
+    ];
+    let currentAvatarUrl = 'images/Rosie.webp';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = JSON.parse(localStorage.getItem('currentUser')) || { name: 'Explorer' };
+      document.getElementById('userName').value = user.name || '';
+      document.getElementById('avatarPreview').src = user.avatar || currentAvatarUrl;
+      currentAvatarUrl = user.avatar || currentAvatarUrl;
+      renderGallery();
+    });
+
+    function renderGallery() {
+      const gallery = document.getElementById('avatarGallery');
+      gallery.innerHTML = '';
+      AVATARS.forEach(path => {
+        const item = document.createElement('div');
+        item.className = 'avatar-opt' + (currentAvatarUrl === path ? ' selected' : '');
+        item.innerHTML = `<img src="${path}">`;
+        item.onclick = () => {
+          currentAvatarUrl = path;
+          document.getElementById('avatarPreview').src = path;
+          renderGallery();
+        };
+        gallery.appendChild(item);
+      });
+    }
+
+    function previewFile() {
+      const file = document.getElementById('avatarUpload').files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        currentAvatarUrl = reader.result;
+        document.getElementById('avatarPreview').src = reader.result;
+        renderGallery();
+      };
+      if (file) reader.readAsDataURL(file);
+    }
+
+    function saveProfile() {
+      const name = document.getElementById('userName').value.trim();
+      if (!name) return alert("Please enter a name!");
+      const user = JSON.parse(localStorage.getItem('currentUser')) || {};
+      user.name = name;
+      user.avatar = currentAvatarUrl;
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      alert("Magic Profile Saved! ✨");
+    }
+  </script>
+</body>
+</html>

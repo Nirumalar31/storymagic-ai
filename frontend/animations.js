@@ -1,0 +1,1 @@
+/* Animations are handled inline in each page */

@@ -1,0 +1,1267 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <script>
+    (function(){try{var u=JSON.parse(localStorage.getItem('currentUser'));if(!u)window.location.replace('login.html');}catch(e){window.location.replace('login.html');}})();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Story Time! — StoryMagic AI</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="animations.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+<style>
+    /* ══════════════════════════════════════════════════
+       MAGICAL STORYBOOK REDESIGN
+    ══════════════════════════════════════════════════ */
+
+    /* ── Book: deeper 3D shadow + golden spine ───── */
+    .storybook-book {
+      box-shadow:
+        0 50px 130px rgba(0,0,0,0.75),
+        0 20px 60px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.1) !important;
+      border-radius: 4px 16px 16px 4px !important;
+    }
+    .storybook-book::before {
+      width: 32px !important;
+      background: linear-gradient(90deg,
+        rgba(0,0,0,0.25) 0%,
+        rgba(212,175,85,0.18) 35%,
+        rgba(255,215,100,0.28) 50%,
+        rgba(212,175,85,0.18) 65%,
+        rgba(0,0,0,0.25) 100%) !important;
+      box-shadow: inset 1px 0 2px rgba(255,215,100,0.15),
+                  inset -1px 0 2px rgba(255,215,100,0.15);
+    }
+
+    /* ── Left page: full-frame scene ───────────── */
+    .left-page {
+      background: #0a0a14 !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      position: relative !important;
+    }
+    .scene-view {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      border-radius: 0 !important;
+      max-height: none !important;
+      aspect-ratio: unset !important;
+      box-shadow: none !important;
+      margin: 0 !important;
+    }
+    /* Vignette overlay */
+    .scene-view::after {
+      content: '' !important;
+      position: absolute !important;
+      inset: 0 !important;
+      background: radial-gradient(ellipse at center,
+        transparent 40%,
+        rgba(0,0,0,0.45) 100%) !important;
+      z-index: 5 !important;
+      pointer-events: none !important;
+      border-radius: 0 !important;
+    }
+    /* Bottom atmospheric fog */
+    #sceneBg::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 45%;
+      background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ── Theme accent colour (set by JS on .storybook-book) ── */
+    .storybook-book { --ta: #9d4edd; }
+
+    /* ── Right page: parchment book feel ─────────── */
+    .right-page {
+      background: linear-gradient(160deg, #fdf9f3 0%, #f5ede0 100%) !important;
+      padding: 36px 48px 28px 64px !important;
+      border-left: none !important;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Page-edge lines (book thickness illusion) */
+    .right-page::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      width: 18px;
+      background: repeating-linear-gradient(
+        to right,
+        rgba(180,140,80,0.08) 0px,
+        rgba(180,140,80,0.04) 3px,
+        rgba(200,160,90,0.1)  4px,
+        rgba(180,140,80,0.04) 5px
+      );
+      pointer-events: none;
+    }
+
+    /* ── Corner ornaments ────────────────────────── */
+    .corner-orn {
+      position: absolute;
+      font-size: 22px;
+      color: var(--ta);
+      opacity: 0.35;
+      pointer-events: none;
+      line-height: 1;
+      transition: color 0.6s;
+    }
+    .corner-orn.tl { top: 14px;  left: 14px;  }
+    .corner-orn.tr { top: 14px;  right: 24px; transform: scaleX(-1); }
+    .corner-orn.bl { bottom: 14px; left: 14px; transform: scaleY(-1); }
+    .corner-orn.br { bottom: 14px; right: 24px; transform: scale(-1,-1); }
+
+    /* ── Chapter header ──────────────────────────── */
+    .page-chapter-header {
+      text-align: center;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1.5px solid rgba(160,110,50,0.18);
+      position: relative;
+    }
+    .chapter-label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--ta);
+      opacity: 0.8;
+    }
+    .chapter-title-text {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: #3d2410;
+      margin-top: 3px;
+      font-weight: 600;
+    }
+    /* small diamond on divider */
+    .page-chapter-header::after {
+      content: '◆';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      color: var(--ta);
+      opacity: 0.5;
+      background: linear-gradient(160deg,#fdf9f3,#f5ede0);
+      padding: 0 6px;
+    }
+
+    /* ── Story text: warm ink + drop cap ─────────── */
+    .story-text-container { flex: 1; }
+    #storyText {
+      color: #2d1a0e !important;
+      text-align: left !important;
+      letter-spacing: 0.01em;
+    }
+    #storyText::first-letter {
+      font-family: var(--font-display);
+      font-size: 2.6em;
+      float: left;
+      line-height: 0.82;
+      margin: 4px 10px 0 0;
+      color: var(--ta);
+      text-shadow: 0 2px 10px color-mix(in srgb, var(--ta) 35%, transparent);
+    }
+
+    /* ── Page footer ─────────────────────────────── */
+    .page-footer-orn {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 12px;
+      color: rgba(160,110,50,0.5);
+      letter-spacing: 2px;
+    }
+
+    /* ── Left page: scene label at bottom ────────── */
+    .scene-caption {
+      position: absolute !important;
+      bottom: 14px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      z-index: 10 !important;
+      margin: 0 !important;
+      white-space: nowrap !important;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      text-shadow: 0 1px 6px rgba(0,0,0,0.8);
+    }
+
+    /* ── Bookmark ribbon ─────────────────────────── */
+    .bookmark-ribbon {
+      position: absolute;
+      top: -6px; right: 60px;
+      width: 22px;
+      height: 70px;
+      background: linear-gradient(180deg, var(--ta) 0%, color-mix(in srgb,var(--ta) 70%,#000) 100%);
+      clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%);
+      z-index: 20;
+      box-shadow: -2px 4px 12px rgba(0,0,0,0.3);
+      transition: background 0.6s;
+    }
+    .bookmark-ribbon::after {
+      content: '🔖';
+      position: absolute;
+      top: 6px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      opacity: 0.7;
+    }
+
+    /* ── Fit book in one screen, maximised ───────── */
+    html, body { overflow: hidden; height: 100%; }
+    main.page-wrapper {
+      padding-top: 0 !important;
+      height: calc(100vh - 80px) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      box-sizing: border-box !important;
+    }
+    .storybook-container { padding: 6px 20px !important; }
+    .storybook-container:last-of-type {
+      flex: 1 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      min-height: 0 !important;
+    }
+    .storybook-container .glass-panel {
+      background: rgba(10,10,20,0.55) !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+      border-radius: 14px !important;
+      padding: 8px 20px !important;
+      margin-bottom: 8px !important;
+    }
+    .storybook-book {
+      flex: 1 !important;
+      min-height: 0 !important;
+      height: auto !important;
+      border-radius: 8px 24px 24px 8px !important;
+      box-shadow:
+        0 0 0 2px rgba(212,175,85,0.25),
+        0 32px 80px rgba(0,0,0,0.7),
+        0 8px 32px rgba(0,0,0,0.5) !important;
+    }
+    .left-page { min-height: unset !important; }
+    .right-page { padding: 24px 36px 18px 48px !important; }
+    .story-nav-controls .btn {
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    }
+
+    /* ── Voice picker ────────────────────────────────────── */
+    .voice-picker {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      background: rgba(160,110,50,0.07);
+      border: 1px solid rgba(160,110,50,0.15);
+      border-radius: 14px;
+    }
+    .voice-picker-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: rgba(100,60,20,0.55);
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+    .voice-btn {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 50px;
+      border: 1.5px solid rgba(160,110,50,0.2);
+      background: rgba(255,255,255,0.55);
+      color: rgba(80,45,10,0.7);
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .voice-btn:hover {
+      background: rgba(160,110,50,0.12);
+      border-color: rgba(160,110,50,0.4);
+      color: rgba(80,45,10,1);
+    }
+    .voice-btn.active {
+      background: linear-gradient(135deg, #ec4899, #a855f7);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(236,72,153,0.35);
+    }
+
+    /* ── Voice avatar bar ───────────────────────────────── */
+    .voice-avatar-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgba(160,110,50,0.06);
+      border: 1px solid rgba(160,110,50,0.12);
+      border-radius: 20px;
+      margin-bottom: 4px;
+    }
+    .voice-avatar-label {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(100,60,20,0.45);
+      white-space: nowrap;
+    }
+    .voice-avatar-row {
+      display: flex;
+      gap: 10px;
+      flex: 1;
+      justify-content: center;
+    }
+    .voice-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 14px;
+      transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .voice-card:hover { transform: translateY(-3px); }
+    .voice-avatar-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2.5px solid transparent;
+      transition: all 0.25s ease;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    }
+    .voice-avatar-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .voice-card.active .voice-avatar-circle {
+      border-color: rgba(80,45,10,0.5);
+      box-shadow: 0 0 0 3px rgba(160,110,50,0.25), 0 3px 10px rgba(0,0,0,0.2);
+      transform: scale(1.12);
+    }
+    .voice-card-name {
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(80,45,10,0.5);
+      font-family: var(--font-ui);
+      transition: color 0.2s;
+    }
+    .voice-card.active .voice-card-name {
+      color: rgba(80,45,10,0.85);
+    }
+
+    /* ── Nav control buttons ─────────────────────────────── */
+    .nav-ctrl-btn {
+      border: none;
+      border-radius: 50px;
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 11px 26px;
+      transition: all 0.2s ease;
+    }
+    .nav-back {
+      background: rgba(160,110,50,0.1);
+      color: rgba(80,45,10,0.65);
+      border: 1.5px solid rgba(160,110,50,0.2);
+    }
+    .nav-back:hover { background: rgba(160,110,50,0.18); color: rgba(80,45,10,0.9); }
+    .nav-back:disabled { opacity: 0.35; cursor: not-allowed; }
+    .nav-listen {
+      background: linear-gradient(135deg, #ec4899, #a855f7);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 28px;
+      box-shadow: 0 6px 20px rgba(236,72,153,0.35);
+    }
+    .nav-next {
+      background: linear-gradient(135deg, #f97316, #ec4899);
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(236,72,153,0.3);
+    }
+
+    .emotion-btn {
+      background: rgba(255,255,255,0.06);
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 24px;
+      padding: 18px 20px 14px;
+      font-size: 42px;
+      cursor: pointer;
+      color: white;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      min-width: 90px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .emotion-btn span {
+      display: block;
+      font-size: 13px;
+      margin-top: 8px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      color: rgba(255,255,255,0.8);
+      letter-spacing: 0.3px;
+    }
+    .emotion-btn:hover {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.35);
+      transform: scale(1.18) translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    }
+    .emotion-btn.selected {
+      background: linear-gradient(135deg, rgba(251,191,36,0.25), rgba(236,72,153,0.2));
+      border-color: #fbbf24;
+      transform: scale(1.22) translateY(-4px);
+      box-shadow: 0 0 0 3px rgba(251,191,36,0.3), 0 12px 32px rgba(251,191,36,0.25);
+    }
+
+    /* ── Theme scene animations ───────────────────────────── */
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.15; transform: scale(0.7); }
+      50%       { opacity: 1;    transform: scale(1.4); }
+    }
+    @keyframes shootingStar {
+      0%   { width: 2px;  opacity: 1; transform: translate(0,0) rotate(30deg); }
+      100% { width: 90px; opacity: 0; transform: translate(180px, 90px) rotate(30deg); }
+    }
+    @keyframes bubbleRise {
+      0%   { transform: translateY(0)     translateX(0);   opacity: 0;   }
+      10%  { opacity: 0.7; }
+      90%  { opacity: 0.4; }
+      100% { transform: translateY(-320px) translateX(18px); opacity: 0; }
+    }
+    @keyframes leafFall {
+      0%   { transform: translateY(-10px)  rotate(0deg)   translateX(0);   opacity: 0.9; }
+      100% { transform: translateY(400px) rotate(720deg) translateX(50px); opacity: 0.2; }
+    }
+    @keyframes heartFloat {
+      0%   { transform: translateY(0)     scale(1);   opacity: 0.9; }
+      100% { transform: translateY(-300px) scale(0.3); opacity: 0;   }
+    }
+    @keyframes fireflyGlow {
+      0%,100% { opacity: 0.1; transform: translate(0,0); }
+      25%     { opacity: 0.9; transform: translate(10px,-14px); }
+      50%     { opacity: 0.4; transform: translate(-8px,-6px); }
+      75%     { opacity: 0.8; transform: translate(14px,-20px); }
+    }
+    @keyframes dinoStomp {
+      0%   { transform: translateY(16px); opacity: 0; }
+      30%  { transform: translateY(0);    opacity: 0.65; }
+      70%  { opacity: 0.65; }
+      100% { opacity: 0; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Background Layers -->
+  <div class="bg-stars"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Navigation Header -->
+  <nav class="nav-pill">
+    <a href="index.html" class="nav-pill-logo">
+      <img src="images/Logo.png" alt="StoryMagic Logo" class="nav-logo-img">
+    </a>
+    <div class="nav-pill-links">
+      <a href="index.html">Home</a>
+      <a href="characters.html">Characters</a>
+      <a href="parent.html">Parents</a>
+    </div>
+    <div class="nav-pill-auth">
+      <!-- Logic in auth.js will fill this -->
+    </div>
+  </nav>
+
+  <main class="page-wrapper" style="padding-top: 80px;">
+    
+    <!-- Story Progress Header -->
+    <div class="storybook-container" style="padding-bottom: 0;">
+      <div class="glass-panel" style="padding: 8px 20px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; min-width: 100%;">
+        <div class="story-id">
+          <h2 id="storyTitleHeader" class="dreamy-title" style="font-size: 1.8rem; margin-bottom: 0;">My Adventure</h2>
+          <span id="pageCounter" style="color: var(--candy-yellow); font-weight: 500; font-family: var(--font-ui);">Page 1 of 5</span>
+        </div>
+        <div class="progress-container" style="width: 200px;">
+          <div class="progress-bar-wrap">
+            <div id="progressFill" class="progress-bar-fill" style="width: 20%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="storybook-container">
+      <div class="storybook-book" id="storybookBook">
+
+        <!-- Bookmark ribbon -->
+        <div class="bookmark-ribbon"></div>
+
+        <!-- Left Page: Visual Scene -->
+        <div class="left-page">
+          <div class="scene-view">
+            <div id="sceneBg" style="position:absolute; inset:0; transition: background 1.2s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+            <video id="bgVideo" loop muted playsinline preload="auto" style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain; z-index:1; display:none; opacity:0; transition:opacity 0.8s; pointer-events:none;"></video>
+
+            <div id="sceneOverlay" style="position:absolute; inset:0; pointer-events:none; z-index:6;"></div>
+          </div>
+          <div class="scene-caption" id="sceneCaption">✨ The Adventure Begins</div>
+        </div>
+
+        <!-- Right Page: Story Text & Choices -->
+        <div class="right-page">
+
+          <!-- Corner ornaments -->
+          <div class="corner-orn tl">❧</div>
+          <div class="corner-orn tr">❧</div>
+          <div class="corner-orn bl">❧</div>
+          <div class="corner-orn br">❧</div>
+
+          <!-- Chapter header -->
+          <div class="page-chapter-header">
+            <div class="chapter-label" id="chapterLabel">Chapter I</div>
+            <div class="chapter-title-text" id="chapterStoryTitle">My Adventure</div>
+          </div>
+
+          <div class="story-text-container">
+            <p id="storyText"></p>
+          </div>
+
+          <!-- Page footer -->
+          <div class="page-footer-orn">— <span id="pageNumDisplay">1</span> —</div>
+
+          <!-- Voice avatar picker -->
+          <div class="voice-avatar-bar">
+            <span class="voice-avatar-label">Narrator</span>
+            <div class="voice-avatar-row">
+              <button class="voice-card active" onclick="selectVoice('fairy',this)">
+                <div class="voice-avatar-circle"><img src="images/Matlida.jpg" alt="Matilda"/></div>
+                <span class="voice-card-name">Matilda</span>
+              </button>
+              <button class="voice-card" onclick="selectVoice('storyteller',this)">
+                <div class="voice-avatar-circle"><img src="images/Rachel.jpg" alt="Rachel"/></div>
+                <span class="voice-card-name">Rachel</span>
+              </button>
+              <button class="voice-card" onclick="selectVoice('hero',this)">
+                <div class="voice-avatar-circle"><img src="images/Antoni.jpg" alt="Antoni"/></div>
+                <span class="voice-card-name">Antoni</span>
+              </button>
+              <button class="voice-card" onclick="selectVoice('cozy',this)">
+                <div class="voice-avatar-circle"><img src="images/Lily.jpg" alt="Lily"/></div>
+                <span class="voice-card-name">Lily</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Story Controls -->
+          <div class="story-nav-controls" style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; gap:10px;">
+            <button id="prevBtn" class="nav-ctrl-btn nav-back jelly-hover" onclick="changePage(-1)">◀ Back</button>
+
+            <button id="narrateBtn" class="nav-ctrl-btn nav-listen jelly-hover" onclick="toggleNarration()">
+              <span id="narrateBtnTxt">🔊 Listen</span>
+              <div id="soundWave" class="sound-wave-container" style="display:none;">
+                <span class="sound-wave-bar" style="animation-delay:0.1s;"></span>
+                <span class="sound-wave-bar" style="animation-delay:0.2s;"></span>
+                <span class="sound-wave-bar" style="animation-delay:0.1s;"></span>
+              </div>
+            </button>
+
+            <button id="nextBtn" class="nav-ctrl-btn nav-next jelly-hover" onclick="changePage(1)">Next ▶</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Ending Magic Section — fixed overlay -->
+      <div id="endSection" style="display:none; position:fixed; inset:0; z-index:999; background:rgba(4,2,18,0.45); backdrop-filter:blur(5px); align-items:center; justify-content:center; animation:fadeIn 0.4s ease;">
+        <div style="background:rgba(10,6,35,0.95); border:1.5px solid rgba(168,85,247,0.35); border-radius:32px; padding:52px 56px; max-width:720px; width:92%; text-align:center; max-height:92vh; overflow-y:auto; box-shadow:0 0 80px rgba(168,85,247,0.2), 0 30px 60px rgba(0,0,0,0.6); position:relative;">
+          <div style="position:absolute;top:0;left:8%;right:8%;height:1.5px;background:linear-gradient(90deg,transparent,rgba(168,85,247,0.8),rgba(236,72,153,0.8),transparent);"></div>
+         <div style="font-size:2.8rem;margin-bottom:8px;filter:drop-shadow(0 4px 16px rgba(251,191,36,0.6));animation:wandPulse 2s ease-in-out infinite;">🏆</div>
+         <h2 class="dreamy-title" style="font-size:2rem; margin-bottom:4px; letter-spacing:0.5px;">What an <span style="background:linear-gradient(135deg,#fbbf24,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Amazing Story!</span></h2>
+         <p style="color:rgba(255,255,255,0.4);font-size:13px;margin:0 0 20px;font-weight:500;letter-spacing:1px;text-transform:uppercase;">You did it! Great reading!</p>
+
+         <div id="quizSection" class="quiz-container">
+            <h3 class="quiz-question" id="quizQuestion" style="color:white; font-size:1.3rem; margin-bottom:12px;">Loading Question...</h3>
+            <div class="quiz-options" id="quizOptions"></div>
+         </div>
+
+         <!-- Emotion Check-in -->
+         <div id="emotionSection" style="display:none; animation:bounceIn 0.6s ease both;">
+           <h3 style="font-family:var(--font-display); font-size:1.3rem; margin:8px 0 20px; background:linear-gradient(135deg,#ec4899,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">How did the story make you feel?</h3>
+           <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin:10px 0 8px;">
+             <button class="emotion-btn jelly-hover" onclick="selectEmotion('Happy', this)">😊<span>Happy</span></button>
+             <button class="emotion-btn jelly-hover" onclick="selectEmotion('Excited', this)">🤩<span>Excited</span></button>
+             <button class="emotion-btn jelly-hover" onclick="selectEmotion('Surprised', this)">😲<span>Surprised</span></button>
+             <button class="emotion-btn jelly-hover" onclick="selectEmotion('Sad', this)">😢<span>Sad</span></button>
+             <button class="emotion-btn jelly-hover" onclick="selectEmotion('Loved it', this)">❤️<span>Loved it!</span></button>
+           </div>
+         </div>
+
+         <div id="conclusionSection" style="display:none;">
+            <div class="glass-panel" style="background:rgba(255,255,255,0.05); text-align:left; margin:18px 0; padding:16px 20px;">
+                <h3 style="color:var(--candy-yellow); margin-bottom:8px; font-size:0.95rem;">Secret Lesson:</h3>
+                <p id="moralText" style="font-weight:400; font-size:1rem; margin:0;"></p>
+            </div>
+            <button id="saveStoryBtn" onclick="toggleSaveStory()" style="
+              width:100%; margin-bottom:14px; padding:14px;
+              border:2px solid rgba(255,255,255,0.2); border-radius:50px;
+              background:rgba(255,255,255,0.07); color:#fff;
+              font-size:15px; font-weight:700; cursor:pointer; font-family:inherit;
+              display:flex; align-items:center; justify-content:center; gap:8px;
+              transition:all 0.3s ease;">
+              <i class="fa-regular fa-heart"></i> Save to My Library
+            </button>
+            <div style="display:flex; gap:14px; justify-content:center;">
+                <a href="index.html" class="btn dreamy-btn-pink jelly-hover">New Story</a>
+                <button class="btn dreamy-btn-purple jelly-hover" onclick="restartStory()">Read Again</button>
+            </div>
+         </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="particleContainer"></div>
+
+  <!-- Global Footer -->
+  <footer class="pro-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="images/Logo.png" alt="StoryMagic Logo" class="footer-logo-img">
+        <p>Making learning to read a magical, unforgettable <br> experience through personalized AI stories.</p>
+        <div class="footer-socials">
+          <a href="https://www.instagram.com/storymagic_ai?igsh=amZ4OW9lZWNyd21r&amp;utm_source=qr" target="_blank" class="footer-social-btn social-instagram" title="Instagram">
+            <img src="images/instagram.webp" alt="Instagram" class="social-icon-img"/>
+          </a>
+          <a href="https://www.tiktok.com/@storymagic_ai?_r=1&amp;_t=ZS-95WrXclgNGr" target="_blank" class="footer-social-btn social-tiktok" title="TikTok">
+            <img src="images/tik tok.webp" alt="TikTok" class="social-icon-img"/>
+          </a>
+          <a href="https://www.youtube.com/@supportstorymagicai" target="_blank" class="footer-social-btn social-youtube" title="YouTube">
+            <img src="images/youtube.png" alt="YouTube" class="social-icon-img"/>
+          </a>
+          <a href="https://www.linkedin.com/in/storymagic-ai" class="footer-social-btn social-linkedin" title="LinkedIn">
+            <img src="images/linkedin.png" alt="LinkedIn" class="social-icon-img"/>
+          </a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="library.html">Library</a></li>
+            <li><a href="characters.html">Characters</a></li>
+            <li><a href="parent.html">Parents Dashboard</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="terms.html">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 StoryMagic AI by Nirumalar Santharan. All rights reserved. Created with ❤️ for young explorers.</p>
+    </div>
+  </footer>
+
+  <script src="auth.js"></script>
+  <script type="module" src="firebase-db.js"></script>
+  <script>
+    let storyData = JSON.parse(localStorage.getItem('storyData') || 'null');
+    let currentPage = 0;
+    let speaking = false;
+    let storyStartTime = 0;
+    let choiceMadeText = null;
+    let emotionPicked = null;
+    let sceneInterval = null;
+    let revealTimers = [];
+
+    const themeColors = {
+      forest: 'linear-gradient(135deg, #2D6A4F, #1B4332)',
+      ocean: 'linear-gradient(135deg, #0077B6, #023E8A)',
+      dinosaur: 'linear-gradient(135deg, #4A4E69, #22223B)',
+      kindness: 'linear-gradient(135deg, #F8A5C2, #F78FB3)',
+      land: 'linear-gradient(135deg, #4361EE, #3F37C9)'
+    };
+
+    function init() {
+      if (!storyData) {
+        window.location.href = 'index.html';
+        return;
+      }
+      storyStartTime = Date.now();
+      document.getElementById('storyTitleHeader').textContent = storyData.title;
+      document.getElementById('chapterStoryTitle').textContent = storyData.title;
+      document.getElementById('sceneBg').style.background = themeColors[storyData.theme] || themeColors.land;
+
+      startThemeScene(storyData.theme);
+
+      // Apply theme accent colour
+      const themeAccents = {
+        forest:'#22c55e', ocean:'#06b6d4', dinosaur:'#84cc16',
+        mystery:'#c084fc', kindness:'#f472b6',
+        moral:'#fb923c', land:'#a78bfa'
+      };
+      const accent = themeAccents[storyData.theme] || '#9d4edd';
+      document.getElementById('storybookBook').style.setProperty('--ta', accent);
+
+      // Apply font size based on age group
+      const ageFontSize = { '4-5': '25px', '6-7': '20px', '8': '17px' };
+      const ageLineHeight = { '4-5': '2.0', '6-7': '1.85', '8': '1.75' };
+      const age = storyData.age || '6-7';
+      const storyText = document.getElementById('storyText');
+      storyText.style.fontSize   = ageFontSize[age]   || '18px';
+      storyText.style.lineHeight = ageLineHeight[age]  || '1.8';
+
+      showPage();
+
+      // Auto-narration is handled inside showPage() for all pages
+
+      // ── Daily Time Limit ────────────────────────────────────
+      if (localStorage.getItem('setting_timeLimit') === '1') {
+        const limitMins = 60;
+        setTimeout(() => {
+          if (speaking) stopNarration();
+          const ol = document.createElement('div');
+          ol.style.cssText = 'position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;background:rgba(4,2,18,0.88);backdrop-filter:blur(12px);';
+          ol.innerHTML = `<div style="background:rgba(8,4,28,0.95);border:1.5px solid rgba(168,85,247,0.4);border-radius:32px;padding:48px 40px;max-width:380px;width:90%;text-align:center;">
+            <div style="font-size:48px;margin-bottom:16px;">⏰</div>
+            <h2 style="font-family:var(--font-display);font-size:1.8rem;color:#fff;margin:0 0 10px;">Time to Take a Break!</h2>
+            <p style="color:rgba(255,255,255,0.6);font-size:15px;margin:0 0 28px;line-height:1.6;">You have been reading for ${limitMins} minutes. Great job! Come back soon for more adventures!</p>
+            <a href="index.html" style="display:inline-block;padding:14px 40px;border-radius:50px;background:linear-gradient(135deg,#ec4899,#f97316);color:#fff;font-weight:800;font-size:16px;text-decoration:none;">Go Home</a>
+          </div>`;
+          document.body.appendChild(ol);
+        }, limitMins * 60 * 1000);
+      }
+    }
+
+    async function showPage(isNavigating = false) {
+      const total = storyData.story.length;
+      const romans = ['I','II','III','IV','V'];
+      document.getElementById('pageCounter').textContent  = `Page ${currentPage + 1} of ${total}`;
+      document.getElementById('chapterLabel').textContent = `Chapter ${romans[currentPage] || currentPage + 1}`;
+      document.getElementById('pageNumDisplay').textContent = currentPage + 1;
+      document.getElementById('progressFill').style.width = ((currentPage + 1) / total * 100) + '%';
+      document.getElementById('prevBtn').disabled = currentPage === 0;
+      document.getElementById('nextBtn').textContent = currentPage === total - 1 ? 'Finish!' : 'Next ▶';
+      
+      const sceneCaptions = ['✨ The Adventure Begins','🌟 The Journey Continues','⚡ A Twist in the Tale','💫 The Brave Choice','🎉 The Grand Finale'];
+      document.getElementById('sceneCaption').textContent = sceneCaptions[currentPage] || '✨ The Magic Continues';
+      updatePageScene(currentPage);
+      revealText(storyData.story[currentPage]);
+
+      // Auto-narration: start on every page if enabled
+      if (localStorage.getItem('setting_autoNarrate') === '1') {
+        if (speaking) stopNarration();
+        setTimeout(() => startNarration(), 900);
+      }
+
+      document.getElementById('nextBtn').style.display = 'block';
+
+      // Always keep end section hidden when navigating pages
+      // It only appears when the child clicks "Finish!" on the last page
+      document.getElementById('endSection').style.display = 'none';
+    }
+
+    function revealText(text) {
+      revealTimers.forEach(clearTimeout);
+      revealTimers = [];
+      const el = document.getElementById('storyText');
+      el.innerHTML = '';
+      const words = text.split(' ');
+      const delay = Math.min(80, Math.max(30, 1600 / words.length));
+      words.forEach((word, i) => {
+        const span = document.createElement('span');
+        span.textContent = word + ' ';
+        span.style.cssText = 'opacity:0;transform:translateY(8px);transition:opacity 0.22s ease,transform 0.22s ease;';
+        el.appendChild(span);
+        revealTimers.push(setTimeout(() => {
+          span.style.opacity = '1';
+          span.style.transform = 'translateY(0)';
+        }, i * delay));
+      });
+    }
+
+    function changePage(dir) {
+      const next = currentPage + dir;
+      if (next >= 0 && next < storyData.story.length) {
+        const book = document.getElementById('storybookBook');
+        book.style.transform = 'rotateY(-5deg) scale(0.98)';
+
+        setTimeout(() => {
+          currentPage = next;
+          showPage(true);
+          book.style.transform = 'rotateY(0) scale(1)';
+        }, 250);
+
+        if (speaking) stopNarration();
+      } else if (next >= storyData.story.length) {
+        // Show end section overlay
+        document.getElementById('endSection').style.display = 'flex';
+        fireConfetti();
+        setupQuiz();
+      }
+    }
+
+    /* ── Voice presets ───────────────────────────────────── */
+    const voicePresets = {
+      fairy:       { elevenId: 'XrExE9yKIg1WjnnlVkGX', label: 'Matilda', gender: 'female', rate: 0.82, pitch: 1.05 },
+      storyteller: { elevenId: '21m00Tcm4TlvDq8ikWAM', label: 'Rachel',  gender: 'female', rate: 0.78, pitch: 1.0  },
+      hero:        { elevenId: 'ErXwobaYiN019PkySvjV', label: 'Antoni',  gender: 'male',   rate: 0.85, pitch: 1.0  },
+      cozy:        { elevenId: 'pFZP5JQG7iQjIQuC4Bku', label: 'Lily',    gender: 'female', rate: 0.75, pitch: 1.0  },
+    };
+    let activeVoice = 'fairy';
+    let cachedVoices = [];
+    let currentAudio = null;
+
+    window.speechSynthesis.onvoiceschanged = () => { cachedVoices = window.speechSynthesis.getVoices(); };
+    cachedVoices = window.speechSynthesis.getVoices();
+
+    function getBestBrowserVoice(gender) {
+      if (!cachedVoices.length) cachedVoices = window.speechSynthesis.getVoices();
+      const en = cachedVoices.filter(v => v.lang.startsWith('en'));
+      const preferred = gender === 'female'
+        ? ['aria','jenny','natasha','samantha','google uk english female','victoria','karen','zira']
+        : ['guy','ryan','steffan','google uk english male','alex','daniel','mark'];
+      for (const kw of preferred) {
+        const found = en.find(v => v.name.toLowerCase().includes(kw));
+        if (found) return found;
+      }
+      return en.find(v => /natural|online/i.test(v.name)) || en[0] || null;
+    }
+
+    function selectVoice(preset, btn) {
+      activeVoice = preset;
+      document.querySelectorAll('.voice-card').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (speaking) { stopNarration(); setTimeout(startNarration, 150); }
+    }
+
+    function toggleNarration() {
+      if (speaking) stopNarration();
+      else startNarration();
+    }
+
+    function setNarratingUI(on) {
+      speaking = on;
+      document.getElementById('narrateBtnTxt').textContent = on ? '⏸ Stop' : '🔊 Listen';
+      document.getElementById('soundWave').style.display   = on ? 'flex' : 'none';
+    }
+
+    async function startNarration() {
+      const text   = storyData.story[currentPage];
+      const preset = voicePresets[activeVoice] || voicePresets.fairy;
+      setNarratingUI(true);
+
+      // ── 1. Try ElevenLabs (most natural) ─────────────────
+      try {
+        const res = await fetch('/api/elevenlabs-tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, voice_id: preset.elevenId })
+        });
+        if (res.ok) {
+          const blob = await res.blob();
+          const url  = URL.createObjectURL(blob);
+          currentAudio = new Audio(url);
+          currentAudio.onended = () => { URL.revokeObjectURL(url); stopNarration(); };
+          currentAudio.play();
+          return;
+        }
+      } catch (_) {}
+
+      // ── 2. Try Google TTS ─────────────────────────────────
+      try {
+        const res = await fetch('/api/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, voice: 'en-US-Journey-F' })
+        });
+        if (res.ok) {
+          const blob = await res.blob();
+          const url  = URL.createObjectURL(blob);
+          currentAudio = new Audio(url);
+          currentAudio.onended = () => { URL.revokeObjectURL(url); stopNarration(); };
+          currentAudio.play();
+          return;
+        }
+      } catch (_) {}
+
+      // ── 3. Fallback: best available browser voice ─────────
+      const msg   = new SpeechSynthesisUtterance(text);
+      const voice = getBestBrowserVoice(preset.gender);
+      if (voice) msg.voice = voice;
+      msg.pitch  = preset.pitch;
+      msg.rate   = preset.rate;
+      msg.volume = 1;
+      msg.onend  = stopNarration;
+      window.speechSynthesis.speak(msg);
+    }
+
+    function stopNarration() {
+      window.speechSynthesis.cancel();
+      if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+      setNarratingUI(false);
+    }
+
+    function setupQuiz() {
+      const quiz = storyData.quiz;
+      if (!quiz) { showEmotionSection(); return; }
+      document.getElementById('quizSection').style.display = 'block';
+      document.getElementById('quizQuestion').textContent = quiz.q;
+
+      const optContainer = document.getElementById('quizOptions');
+      optContainer.innerHTML = '';
+      const wrongOpts = quiz.wrong || ['Something different', 'A big surprise', 'Something else'];
+      const options = [quiz.a, ...wrongOpts].sort(() => Math.random() - 0.5);
+
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-btn jelly-hover';
+        btn.textContent = opt;
+        btn.onclick = () => {
+          if (opt === quiz.a) {
+            btn.classList.add('correct');
+            fireConfetti();
+            setTimeout(showEmotionSection, 1500);
+          } else {
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 500);
+          }
+        };
+        optContainer.appendChild(btn);
+      });
+    }
+
+    function showEmotionSection() {
+      document.getElementById('quizSection').style.display = 'none';
+      document.getElementById('emotionSection').style.display = 'block';
+    }
+
+    function selectEmotion(emotion, btn) {
+      emotionPicked = emotion;
+      document.querySelectorAll('.emotion-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      setTimeout(showConclusion, 700);
+    }
+
+    async function showConclusion() {
+      document.getElementById('emotionSection').style.display = 'none';
+      document.getElementById('conclusionSection').style.display = 'block';
+      document.getElementById('moralText').textContent = storyData.moral || "What a lovely lesson!";
+      updateSaveBtn();
+
+      const user = getCurrentUser();
+      const readingTimeSecs = Math.round((Date.now() - storyStartTime) / 1000);
+
+      // Save reading session to Firebase
+      if (user && typeof window.saveReadingSession === 'function') {
+        window.saveReadingSession({
+          userId: user.email,
+          childName: user.name,
+          theme: storyData.theme || 'unknown',
+          age: storyData.age || '4-5',
+          title: storyData.title || 'Untitled Story',
+          pagesCompleted: storyData.story.length,
+          choiceMade: choiceMadeText,
+          emotion: emotionPicked,
+          quizPassed: true,
+          readingTimeSecs
+        });
+      }
+
+      // Update reader stats → badges → weekly progress → Firebase
+      const stats = getReaderStats();
+      stats.storiesCompleted = (stats.storiesCompleted || 0) + 1;
+      const theme = storyData.theme || 'unknown';
+      if (!stats.themes) stats.themes = {};
+      stats.themes[theme] = (stats.themes[theme] || 0) + 1;
+      stats.storiesSaved = (JSON.parse(localStorage.getItem('savedStories') || '[]')).length;
+      localStorage.setItem('readerStats', JSON.stringify(stats));
+
+      setTimeout(async () => {
+        checkAndAwardBadges(stats);
+        // Sync weekly progress to Firebase
+        if (typeof window.saveWeeklyProgress === 'function') {
+          await window.saveWeeklyProgress(stats.storiesCompleted);
+        }
+        // Sync badges to Firebase
+        const earned = JSON.parse(localStorage.getItem('earnedBadges') || '[]');
+        if (typeof window.saveBadgesToFirebase === 'function') {
+          await window.saveBadgesToFirebase(earned);
+        }
+      }, 800);
+    }
+
+    function fireConfetti() {
+      for (let i = 0; i < 60; i++) {
+        const c = document.createElement('div');
+        c.className = 'particle';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.top = '100vh';
+        c.style.background = ['#FF4081','#00E5FF','#FFD600','#64FFDA'][Math.floor(Math.random()*4)];
+        c.style.width = '10px';
+        c.style.height = '10px';
+        c.style.borderRadius = '2px';
+        c.style.animation = `floatParticle ${Math.random()*2 + 2}s linear forwards`;
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 4000);
+      }
+    }
+
+    function startThemeScene(theme) {
+      const overlay = document.getElementById('sceneOverlay');
+      overlay.innerHTML = '';
+      if (sceneInterval) { clearInterval(sceneInterval); sceneInterval = null; }
+      const vid = document.getElementById('bgVideo');
+      if (vid) { vid.pause(); vid.removeAttribute('src'); vid.style.opacity = '0'; vid.style.display = 'none'; }
+
+      const mk = (tag = 'div') => document.createElement(tag);
+      const add = (el, dur) => { overlay.appendChild(el); if (dur) setTimeout(() => el.remove(), dur); };
+
+      if (theme === 'ocean') {
+        sceneInterval = setInterval(() => {
+          const b = mk(); const sz = 8+Math.random()*22; const dur = (3+Math.random()*3)*1000;
+          b.style.cssText = `position:absolute;width:${sz}px;height:${sz}px;
+            border:1.5px solid rgba(255,255,255,0.45);border-radius:50%;
+            left:${5+Math.random()*85}%;bottom:0;
+            background:rgba(255,255,255,0.07);
+            animation:bubbleRise ${dur/1000}s ease-in forwards;`;
+          add(b, dur+100);
+        }, 650);
+
+      } else if (theme === 'forest' || theme === 'jungle') {
+        const leafSet = theme === 'jungle' ? ['🌿','🍃','🌴'] : ['🍃','🍂','🌿'];
+        for (let i = 0; i < 7; i++) {
+          const f = mk();
+          f.style.cssText = `position:absolute;width:7px;height:7px;background:#ADFF2F;
+            border-radius:50%;left:${10+Math.random()*80}%;top:${20+Math.random()*55}%;
+            animation:fireflyGlow ${3+Math.random()*4}s ease-in-out infinite;
+            animation-delay:${Math.random()*5}s;
+            box-shadow:0 0 8px #ADFF2F,0 0 18px #ADFF2F88;`;
+          overlay.appendChild(f);
+        }
+        sceneInterval = setInterval(() => {
+          const l = mk(); const dur = (4+Math.random()*3)*1000;
+          l.style.cssText = `position:absolute;font-size:${14+Math.random()*10}px;
+            left:${Math.random()*88}%;top:-20px;
+            animation:leafFall ${dur/1000}s linear forwards;pointer-events:none;`;
+          l.textContent = leafSet[Math.floor(Math.random()*leafSet.length)];
+          add(l, dur+100);
+        }, 650);
+
+      } else if (theme === 'kindness') {
+        const items = ['❤️','💕','💖','✨','🌸','🌺'];
+        sceneInterval = setInterval(() => {
+          const h = mk(); const dur = (3+Math.random()*3)*1000;
+          h.style.cssText = `position:absolute;font-size:${14+Math.random()*14}px;
+            left:${5+Math.random()*85}%;bottom:8%;
+            animation:heartFloat ${dur/1000}s ease-out forwards;`;
+          h.textContent = items[Math.floor(Math.random()*items.length)];
+          add(h, dur+100);
+        }, 800);
+
+      } else if (theme === 'dinosaur') {
+        sceneInterval = setInterval(() => {
+          const p = mk(); const dur = 2200;
+          p.style.cssText = `position:absolute;font-size:22px;
+            left:${5+Math.random()*80}%;bottom:${5+Math.random()*18}%;
+            animation:dinoStomp ${dur/1000}s ease forwards;filter:opacity(0.5);`;
+          p.textContent = Math.random()>0.5 ? '🦶' : '🐾';
+          add(p, dur+100);
+        }, 1400);
+
+      } else {
+        const sparkles = ['✨','⭐','🌟','💫'];
+        sceneInterval = setInterval(() => {
+          const s = mk(); const dur = (2.5+Math.random()*3)*1000;
+          s.style.cssText = `position:absolute;font-size:${12+Math.random()*12}px;
+            left:${5+Math.random()*85}%;bottom:12%;
+            animation:heartFloat ${dur/1000}s ease-out forwards;`;
+          s.textContent = sparkles[Math.floor(Math.random()*sparkles.length)];
+          add(s, dur+100);
+        }, 750);
+      }
+    }
+
+    function updatePageScene(pageIndex) {
+      const themeFileMap = { dinosaur: 'dinos' };
+      const ageFileMap = { '8': '7-8' };
+      const theme = storyData.theme;
+      const rawAge = (storyData.age || '6-7').replace(/\s+/g, '');
+      const age   = ageFileMap[rawAge] || rawAge;
+      const vid   = document.getElementById('bgVideo');
+      if (!vid) return;
+
+      const fileTheme = themeFileMap[theme] || theme;
+      const path = `images/${fileTheme}_${age}_p${pageIndex + 1}.mp4`;
+
+      vid.style.opacity = '0';
+      vid.onloadeddata = null;
+      vid.onerror      = null;
+
+      const playVideo = () => {
+        document.getElementById('sceneBg').style.background = '#000';
+        vid.style.display = 'block';
+        vid.play().catch(() => {});
+        setTimeout(() => { vid.style.opacity = '1'; }, 60);
+        if (sceneInterval) { clearInterval(sceneInterval); sceneInterval = null; }
+        document.getElementById('sceneOverlay').innerHTML = '';
+        const nextPath = `images/${fileTheme}_${age}_p${pageIndex + 2}.mp4`;
+        if (pageIndex + 1 < storyData.story.length) {
+          const pre = document.createElement('video');
+          pre.preload = 'auto';
+          pre.src = nextPath;
+        }
+      };
+
+      vid.onerror = () => {
+        vid.style.display = 'none';
+        vid.removeAttribute('src');
+        document.getElementById('sceneBg').style.background = '';
+        if (!sceneInterval) startThemeScene(storyData.theme);
+      };
+      vid.onloadeddata = playVideo;
+
+      // If already buffered (preloaded), play immediately without reloading
+      if (vid.src.endsWith(path.replace('models/', '')) && vid.readyState >= 2) {
+        vid.onloadeddata = null;
+        playVideo();
+      } else {
+        vid.src = path;
+      }
+    }
+
+    /* ── Save / unsave story ──────────────────── */
+    function getSavedStories() {
+      try { return JSON.parse(localStorage.getItem('savedStories') || '[]'); } catch { return []; }
+    }
+
+    function getStoryId() {
+      return `${storyData.theme}-${(storyData.name||'').toLowerCase()}-${storyData.title||''}`;
+    }
+
+    function isStorySaved() {
+      return getSavedStories().some(s => s.id === getStoryId());
+    }
+
+    function updateSaveBtn() {
+      const btn  = document.getElementById('saveStoryBtn');
+      const saved = isStorySaved();
+      btn.innerHTML = saved
+        ? '<i class="fa-solid fa-heart" style="color:#ec4899;"></i> Saved to My Library'
+        : '<i class="fa-regular fa-heart"></i> Save to My Library';
+      btn.style.background   = saved ? 'rgba(236,72,153,0.18)' : 'rgba(255,255,255,0.07)';
+      btn.style.borderColor  = saved ? 'rgba(236,72,153,0.6)'  : 'rgba(255,255,255,0.2)';
+    }
+
+    function toggleSaveStory() {
+      let saved = getSavedStories();
+      const id  = getStoryId();
+      if (saved.some(s => s.id === id)) {
+        saved = saved.filter(s => s.id !== id);
+      } else {
+        // Store full story data so it can be replayed from the library
+        saved.push({
+          id,
+          title:      storyData.title || 'My Story',
+          theme:      storyData.theme,
+          age:        storyData.age,
+          character:  storyData.character,
+          name:       storyData.name,
+          savedAt:    new Date().toISOString(),
+          storyData:  JSON.parse(JSON.stringify(storyData))
+        });
+        fireConfetti();
+      }
+      localStorage.setItem('savedStories', JSON.stringify(saved));
+      updateSaveBtn();
+      // Sync saved stories to Firebase
+      if (typeof window.saveSavedStoriesToFirebase === 'function') {
+        window.saveSavedStoriesToFirebase(saved);
+      }
+    }
+
+    function restartStory() {
+      currentPage = 0;
+      emotionPicked = null;
+      document.getElementById('emotionSection').style.display = 'none';
+      document.getElementById('conclusionSection').style.display = 'none';
+      document.getElementById('quizSection').style.display = 'block';
+      startThemeScene(storyData.theme);
+      showPage();
+    }
+
+    /* ── Global Magic ── */
+    (function spawnParticles() {
+      const items = ['⭐', '🌟', '✨', '💫', '🔮', '🌈', '🎈', '🦋'];
+      const container = document.getElementById('particleContainer');
+      setInterval(() => {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.textContent = items[Math.floor(Math.random() * items.length)];
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.fontSize = (14 + Math.random() * 16) + 'px';
+        const dur = 8 + Math.random() * 10;
+        p.style.animationDuration = dur + 's';
+        p.style.animationDelay = Math.random() * 2 + 's';
+        container.appendChild(p);
+        setTimeout(() => p.remove(), (dur + 2) * 1000);
+      }, 1200);
+    })();
+
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('button') || e.target.closest('.choice-orb')) return;
+      const spark = document.createElement('div');
+      spark.className = 'spark';
+      const emojis = ['✨', '⭐', '💫', '🌟', '🎉'];
+      spark.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      spark.style.left = e.clientX + 'px';
+      spark.style.top = e.clientY + 'px';
+      document.body.appendChild(spark);
+      setTimeout(() => spark.remove(), 1000);
+    });
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+  <script src="animations.js"></script>
+</body>
+</html>

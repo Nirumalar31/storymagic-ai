@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <script>
+    (function(){try{var u=JSON.parse(localStorage.getItem('currentUser'));if(u)window.location.replace(u.role==='parent'?'parent.html':'index.html');}catch(e){}})();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome Back — StoryMagic AI</title>
+  <meta name="description" content="Login to StoryMagic AI as a Parent or Child and begin your magical story adventure."/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="animations.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    /* ── Login-specific styles ─────────────────────────────── */
+    .login-wrapper {
+      min-height: calc(100vh - 80px);
+      margin-top: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 80px;
+      padding: 24px 48px;
+    }
+
+    /* ── Left: video panel ───────────────────────────────── */
+    .login-video-panel {
+      flex: 1;
+      max-width: 560px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      animation: slideUp 0.5s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .login-video-label {
+      font-family: 'Bubblegum Sans', 'Nunito', cursive;
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #fff;
+      text-align: center;
+    }
+
+    .login-video-label span {
+      color: var(--candy-pink, #f472b6);
+    }
+
+    .login-video-label p {
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.55);
+      margin: 6px 0 0;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .video-frame-wrap {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06) inset;
+    }
+
+    .video-frame-wrap iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* ── Right: login card ───────────────────────────────── */
+    .login-card {
+      width: 100%;
+      max-width: 460px;
+      background: rgba(8, 4, 28, 0.42);
+      border: 1px solid rgba(168,85,247,0.35);
+      border-radius: 32px;
+      padding: 44px 40px 40px;
+      backdrop-filter: blur(32px);
+      box-shadow:
+        0 0 0 1px rgba(168,85,247,0.1) inset,
+        0 30px 80px rgba(0,0,0,0.6),
+        0 0 80px rgba(168,85,247,0.08),
+        0 0 160px rgba(236,72,153,0.05);
+      animation: slideUp 0.5s cubic-bezier(0.34,1.56,0.64,1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* top shimmer line */
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 10%; right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(168,85,247,0.7), rgba(236,72,153,0.7), transparent);
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(32px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ── Card top icon ────────────────────────────────────── */
+    .card-top-icon {
+      text-align: center;
+      font-size: 2.4rem;
+      margin-bottom: 10px;
+      line-height: 1;
+      filter: drop-shadow(0 0 12px rgba(168,85,247,0.6));
+    }
+
+    .login-brand {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .login-brand h1 {
+      font-family: 'Bubblegum Sans', 'Nunito', cursive;
+      font-size: 2rem;
+      margin: 0 0 6px;
+      line-height: 1.1;
+    }
+
+    .login-brand h1 span {
+      background: linear-gradient(135deg, #d08aff, #ff7eb9, #7eb8ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .login-brand p {
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.4);
+      font-weight: 500;
+    }
+
+    /* ── Role Tabs ─────────────────────────────────────────── */
+    .role-tabs {
+      display: flex;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 50px;
+      padding: 5px;
+      margin-bottom: 28px;
+      gap: 4px;
+    }
+
+    .role-tab {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 11px 16px;
+      border-radius: 50px;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.35);
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      letter-spacing: 0.3px;
+    }
+
+    .role-tab .tab-icon { font-size: 17px; line-height: 1; }
+
+    .role-tab.active-parent {
+      background: linear-gradient(135deg, #6d28d9, #a855f7);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(109,40,217,0.55);
+    }
+
+    .role-tab.active-child {
+      background: linear-gradient(135deg, #ec4899, #f97316);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(236,72,153,0.55);
+    }
+
+    .role-tab:hover:not(.active-parent):not(.active-child) {
+      background: rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.65);
+    }
+
+    /* ── Form Panel ────────────────────────────────────────── */
+    .form-panel {
+      display: none;
+      flex-direction: column;
+      gap: 18px;
+      animation: fadePanel 0.3s ease;
+    }
+
+    .form-panel.active { display: flex; }
+
+    @keyframes fadePanel {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .field-group { display: flex; flex-direction: column; gap: 7px; }
+
+    .field-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    /* input with icon */
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap .input-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    .field-input {
+      width: 100%;
+      padding: 14px 18px 14px 44px;
+      background: rgba(255,255,255,0.05);
+      border: 1.5px solid rgba(255,255,255,0.09);
+      border-radius: 50px;
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      box-sizing: border-box;
+    }
+
+    .field-input::placeholder { color: rgba(255,255,255,0.2); }
+
+    .field-input:-webkit-autofill,
+    .field-input:-webkit-autofill:hover,
+    .field-input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0 1000px rgba(8,4,28,0.85) inset !important;
+      -webkit-text-fill-color: #fff !important;
+      caret-color: #fff;
+    }
+
+    .field-input:focus {
+      border-color: rgba(168,85,247,0.55);
+      background: rgba(168,85,247,0.07);
+      box-shadow: 0 0 0 3px rgba(168,85,247,0.12);
+    }
+
+    #childPanel .field-input:focus {
+      border-color: rgba(236,72,153,0.55);
+      background: rgba(236,72,153,0.07);
+      box-shadow: 0 0 0 3px rgba(236,72,153,0.12);
+    }
+
+    .forgot-link { text-align: right; margin-top: -6px; }
+
+    .forgot-link a {
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.3);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .forgot-link a:hover { color: rgba(255,255,255,0.6); }
+
+    /* ── Login Buttons ─────────────────────────────────────── */
+    .login-btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+      margin-top: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 60%);
+      border-radius: 50px;
+    }
+
+    .login-btn-parent {
+      background: linear-gradient(135deg, #6d28d9, #a855f7, #c084fc);
+      color: #fff;
+      box-shadow: 0 6px 28px rgba(109,40,217,0.5);
+    }
+
+    .login-btn-parent:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 36px rgba(109,40,217,0.65);
+    }
+
+    .login-btn-parent:active { transform: scale(0.98); }
+
+    .login-btn-child {
+      background: linear-gradient(135deg, #be185d, #ec4899, #f97316);
+      color: #fff;
+      box-shadow: 0 6px 28px rgba(236,72,153,0.5);
+    }
+
+    .login-btn-child:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 36px rgba(236,72,153,0.65);
+    }
+
+    .login-btn-child:active { transform: scale(0.98); }
+
+    /* ── Error / Status ────────────────────────────────────── */
+    .login-error {
+      display: none;
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: #f87171;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      animation: shake 0.3s ease;
+    }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25%      { transform: translateX(-6px); }
+      75%      { transform: translateX(6px); }
+    }
+
+    /* ── Bottom Link ───────────────────────────────────────── */
+    .login-footer-text {
+      text-align: center;
+      font-size: 14px;
+      color: rgba(255,255,255,0.4);
+      font-weight: 500;
+      margin-top: 8px;
+    }
+
+    .login-footer-text a {
+      color: #a78bfa;
+      text-decoration: none;
+      font-weight: 700;
+      transition: color 0.2s;
+    }
+
+    .login-footer-text a:hover { color: #c4b5fd; }
+
+    /* ── Child panel accent ────────────────────────────────── */
+    #childPanel .login-footer-text a { color: #f9a8d4; }
+    #childPanel .login-footer-text a:hover { color: #fce7f3; }
+
+    /* ── Divider ───────────────────────────────────────────── */
+    .or-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 4px 0;
+    }
+
+    .or-divider::before,
+    .or-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .or-divider span {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.18);
+      letter-spacing: 1px;
+    }
+
+    /* ── Role Badge ────────────────────────────────────────── */
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .role-badge-parent {
+      background: rgba(124,58,237,0.2);
+      border: 1px solid rgba(168,85,247,0.4);
+      color: #c4b5fd;
+    }
+
+    .role-badge-child {
+      background: rgba(236,72,153,0.2);
+      border: 1px solid rgba(249,115,22,0.4);
+      color: #fda4af;
+    }
+
+    /* ── Child Welcome Block ────────────────────────────────── */
+    .child-welcome {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .child-welcome-emoji {
+      font-size: 52px;
+      line-height: 1;
+      margin-bottom: 8px;
+      display: block;
+      animation: bounce 1.8s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+
+    .child-welcome-text {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: rgba(255,255,255,0.92);
+      margin: 0;
+      min-height: 1.8rem;
+      transition: color 0.3s;
+    }
+
+    /* ── Avatar Picker Grid ─────────────────────────────────── */
+    .avatar-picker {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .avatar-opt {
+      flex: 1;
+      min-width: 44px;
+      aspect-ratio: 1;
+      font-size: 26px;
+      border-radius: 14px;
+      border: 2px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
+      line-height: 1;
+      padding: 0;
+    }
+
+    .avatar-opt:hover {
+      background: rgba(236,72,153,0.15);
+      border-color: rgba(236,72,153,0.5);
+      transform: scale(1.12);
+    }
+
+    .avatar-opt.selected {
+      background: linear-gradient(135deg, rgba(236,72,153,0.25), rgba(249,115,22,0.25));
+      border-color: #ec4899;
+      box-shadow: 0 0 0 3px rgba(236,72,153,0.2), 0 4px 16px rgba(236,72,153,0.3);
+      transform: scale(1.1);
+    }
+
+    /* ── Child Name Input (bigger, friendlier) ──────────────── */
+    .child-name-input {
+      font-size: 18px !important;
+      font-weight: 700 !important;
+      padding: 16px 20px !important;
+      border-radius: 16px !important;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    .child-name-input:focus {
+      border-color: rgba(236,72,153,0.6) !important;
+      background: rgba(236,72,153,0.08) !important;
+      box-shadow: 0 0 0 3px rgba(236,72,153,0.15) !important;
+    }
+
+    /* Force hide nav links on login page — auth.js cannot override this */
+    .nav-pill-links,
+    .nav-pill-auth { display: none !important; }
+
+    @media (max-width: 900px) {
+      .login-wrapper {
+        flex-direction: column;
+        padding: 24px 24px;
+        gap: 32px;
+      }
+      .login-video-panel {
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Layers -->
+  <div class="bg-stars"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Navigation -->
+  <nav class="nav-pill">
+    <a href="index.html" class="nav-pill-logo">
+      <img src="images/Logo.png" alt="StoryMagic Logo" class="nav-logo-img">
+    </a>
+    <div style="position:absolute;left:50%;transform:translateX(-50%);pointer-events:none;">
+      <span style="
+        font-family:var(--font-display);
+        font-size:1.6rem;
+        font-weight:900;
+        background:linear-gradient(135deg,#fff 0%,#f9a8d4 40%,#fbbf24 100%);
+        -webkit-background-clip:text;
+        -webkit-text-fill-color:transparent;
+        background-clip:text;
+        filter:drop-shadow(0 2px 12px rgba(236,72,153,0.5));
+        letter-spacing:0.5px;
+      ">StoryMagic AI</span>
+    </div>
+    <div class="nav-pill-links">
+      <a href="index.html">Home</a>
+      <a href="characters.html">Characters</a>
+      <a href="parent.html">Parents</a>
+    </div>
+    <div class="nav-pill-auth"></div>
+  </nav>
+
+  <!-- Two-column login layout -->
+  <main class="login-wrapper">
+
+    <!-- Left: Promo Video -->
+    <div class="login-video-panel">
+      <div class="login-video-label">
+        See the <span>Magic</span> in Action
+        <p>Watch how StoryMagic AI brings your child's story to life</p>
+      </div>
+      <div class="video-frame-wrap">
+        <iframe
+          src="https://www.youtube.com/embed/Ri0NhbSjKCg?autoplay=0&rel=0&modestbranding=1"
+          title="StoryMagic AI Promo"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+
+    <!-- Right: Login Card -->
+    <div class="login-card">
+
+      <!-- Brand -->
+      <div class="login-brand">
+        <h1>Welcome <span>Back!</span></h1>
+        <p>Sign in to continue your magical adventure</p>
+      </div>
+
+      <!-- Role Tabs -->
+      <div class="role-tabs" role="tablist" aria-label="Login type selector">
+        <button
+          id="tabParent"
+          class="role-tab active-parent"
+          role="tab"
+          aria-selected="true"
+          aria-controls="parentPanel"
+          onclick="switchTab('parent')"
+        >
+          <span>Parent</span>
+        </button>
+        <button
+          id="tabChild"
+          class="role-tab"
+          role="tab"
+          aria-selected="false"
+          aria-controls="childPanel"
+          onclick="switchTab('child')"
+        >
+          <span>Child</span>
+        </button>
+      </div>
+
+      <!-- ── Parent Login Panel ── -->
+      <div id="parentPanel" class="form-panel active" role="tabpanel" aria-labelledby="tabParent">
+
+        <div id="parentError" class="login-error"></div>
+
+        <div class="field-group">
+          <label class="field-label" for="parentEmail">Email Address</label>
+          <div class="input-wrap">
+            <span class="input-icon"><i class="fa fa-envelope"></i></span>
+            <input id="parentEmail" type="email" class="field-input" placeholder="parent@email.com" autocomplete="email"/>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="parentPassword">Password</label>
+          <div class="input-wrap">
+            <span class="input-icon"><i class="fa fa-lock"></i></span>
+            <input id="parentPassword" type="password" class="field-input" placeholder="••••••••" autocomplete="current-password"/>
+          </div>
+        </div>
+
+        <div class="forgot-link">
+          <a href="#" onclick="openForgotModal(); return false;">Forgot Password?</a>
+        </div>
+
+        <button id="parentLoginBtn" class="login-btn login-btn-parent" onclick="handleParentLogin()">
+          Sign In as Parent
+        </button>
+
+        <p class="login-footer-text">
+          New here? <a href="signup.html">Create an account</a>
+        </p>
+      </div>
+
+      <!-- ── Child Login Panel ── -->
+      <div id="childPanel" class="form-panel" role="tabpanel" aria-labelledby="tabChild">
+
+        <div class="child-welcome">
+          <div class="child-welcome-emoji" id="greetEmoji"></div>
+          <p class="child-welcome-text">Hi there! What's your name?</p>
+        </div>
+
+        <div id="childError" class="login-error"></div>
+
+        <div class="field-group">
+          <label class="field-label" for="childName">Your Name</label>
+          <div class="input-wrap">
+            <span class="input-icon"><i class="fa fa-user"></i></span>
+            <input
+              id="childName"
+              type="text"
+              class="field-input child-name-input"
+              placeholder="e.g. Mia, Leo, Zara…"
+              maxlength="20"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="words"
+              spellcheck="false"
+            />
+          </div>
+        </div>
+
+        <button id="childLoginBtn" class="login-btn login-btn-child" onclick="handleChildLogin()">
+          Let's Go!
+        </button>
+
+        <p class="login-footer-text">
+          Ask mummy or daddy to <a href="signup.html">set up your account</a>
+        </p>
+      </div>
+
+    </div><!-- end login-card -->
+  </main>
+
+  <!-- ── Forgot Password Modal ──────────────────────────── -->
+  <div id="forgotOverlay" onclick="closeForgotModal(event)" style="
+    display:none; position:fixed; inset:0; z-index:9999;
+    background:rgba(4,2,18,0.75); backdrop-filter:blur(10px);
+    align-items:center; justify-content:center; padding:24px;">
+    <div id="forgotCard" style="
+      background:rgba(12,8,40,0.92);
+      border:1.5px solid rgba(255,255,255,0.14);
+      border-radius:28px; padding:44px 40px;
+      max-width:400px; width:100%;
+      box-shadow:0 40px 80px rgba(0,0,0,0.6);
+      animation:popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      text-align:center;">
+
+      <!-- Default state -->
+      <div id="forgotDefault">
+        <i class="fa-solid fa-key" style="font-size:40px;color:#a855f7;margin-bottom:18px;display:block;"></i>
+        <h2 style="font-family:var(--font-display);font-size:1.6rem;color:#fff;margin:0 0 8px;">Forgot Password?</h2>
+        <p style="color:rgba(255,255,255,0.55);font-size:14px;margin:0 0 28px;line-height:1.6;">
+          Enter your email address and we'll send you a link to reset your password.
+        </p>
+        <div style="position:relative;margin-bottom:20px;">
+          <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.4);font-size:14px;">
+            <i class="fa-regular fa-envelope"></i>
+          </span>
+          <input id="forgotEmail" type="email" placeholder="your@email.com" autocomplete="email"
+            style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);
+              border:1.5px solid rgba(255,255,255,0.15);border-radius:14px;
+              padding:14px 16px 14px 42px;color:#fff;font-size:15px;
+              outline:none;font-family:inherit;transition:border-color 0.2s;"
+            onfocus="this.style.borderColor='rgba(168,85,247,0.6)'"
+            onblur="this.style.borderColor='rgba(255,255,255,0.15)'"
+            onkeydown="if(event.key==='Enter')sendResetLink()"/>
+        </div>
+        <div id="forgotError" style="color:#f87171;font-size:13px;margin-bottom:14px;min-height:18px;"></div>
+        <button onclick="sendResetLink()" style="
+          width:100%;padding:14px;border:none;border-radius:14px;
+          background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;
+          font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;
+          box-shadow:0 6px 24px rgba(124,58,237,0.45);
+          transition:transform 0.2s,box-shadow 0.2s;"
+          onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 32px rgba(124,58,237,0.6)'"
+          onmouseout="this.style.transform='';this.style.boxShadow='0 6px 24px rgba(124,58,237,0.45)'">
+          Send Reset Link
+        </button>
+        <button onclick="closeForgotModal()" style="
+          width:100%;padding:12px;margin-top:10px;border:none;
+          background:transparent;color:rgba(255,255,255,0.4);
+          font-size:14px;cursor:pointer;font-family:inherit;">
+          Cancel
+        </button>
+      </div>
+
+      <!-- Success state -->
+      <div id="forgotSuccess" style="display:none;">
+        <i class="fa-solid fa-paper-plane" style="font-size:44px;color:#22c55e;margin-bottom:18px;display:block;"></i>
+        <h2 style="font-family:var(--font-display);font-size:1.6rem;color:#fff;margin:0 0 10px;">Check Your Email!</h2>
+        <p style="color:rgba(255,255,255,0.6);font-size:14px;margin:0 0 28px;line-height:1.7;">
+          If an account exists for <strong id="forgotEmailSent" style="color:#fff;"></strong>,
+          a password reset link has been sent. Check your inbox (and spam folder).
+        </p>
+        <button onclick="closeForgotModal()" style="
+          width:100%;padding:14px;border:none;border-radius:14px;
+          background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;
+          font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;
+          box-shadow:0 6px 24px rgba(34,197,94,0.4);">
+          Back to Login
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script>
+    /* ── Tab Switcher ─────────────────────────────────────── */
+    function switchTab(role) {
+      const parentPanel = document.getElementById('parentPanel');
+      const childPanel  = document.getElementById('childPanel');
+      const tabParent   = document.getElementById('tabParent');
+      const tabChild    = document.getElementById('tabChild');
+
+      if (role === 'parent') {
+        parentPanel.classList.add('active');
+        childPanel.classList.remove('active');
+        tabParent.classList.add('active-parent');
+        tabChild.classList.remove('active-child');
+        tabParent.setAttribute('aria-selected', 'true');
+        tabChild.setAttribute('aria-selected', 'false');
+      } else {
+        childPanel.classList.add('active');
+        parentPanel.classList.remove('active');
+        tabChild.classList.add('active-child');
+        tabParent.classList.remove('active-parent');
+        tabChild.setAttribute('aria-selected', 'true');
+        tabParent.setAttribute('aria-selected', 'false');
+      }
+
+      // Clear errors on switch
+      document.getElementById('parentError').style.display = 'none';
+      document.getElementById('childError').style.display  = 'none';
+    }
+
+    /* ── Show error helper ────────────────────────────────── */
+    function showError(id, msg) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.style.display = 'block';
+      // re-trigger shake animation
+      el.style.animation = 'none';
+      el.offsetHeight; // reflow
+      el.style.animation = '';
+    }
+
+    /* ── Parent Login ─────────────────────────────────────── */
+    function handleParentLogin() {
+      const email    = document.getElementById('parentEmail').value.trim();
+      const password = document.getElementById('parentPassword').value;
+
+      if (!email) return showError('parentError', 'Please enter your email address.');
+      if (!password) return showError('parentError', 'Please enter your password.');
+      if (!email.includes('@')) return showError('parentError', 'Please enter a valid email address.');
+
+      // Animate button
+      const btn = document.getElementById('parentLoginBtn');
+      btn.textContent = 'Signing in…';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        const registry = JSON.parse(localStorage.getItem('parentRegistry') || '{}');
+        const entry = registry[email.toLowerCase()];
+        const parentName   = (typeof entry === 'object' ? entry.name   : entry) || 'Parent';
+        const parentAvatar = (typeof entry === 'object' ? entry.avatar : null);
+        const user = mockLogin(email, parentName, 'parent', null, parentAvatar);
+      }, 800);
+    }
+
+    let selectedChildAvatar = 'images/Profile7.jpeg';
+
+    /* ── Child Login — name only ──────────────────────────── */
+    function handleChildLogin() {
+      const name = document.getElementById('childName').value.trim();
+
+      if (!name) {
+        showError('childError', '✏️ Please tell us your name!');
+        document.getElementById('childName').focus();
+        return;
+      }
+      if (name.length < 2) {
+        showError('childError', '✏️ Your name needs at least 2 letters!');
+        return;
+      }
+
+      const btn = document.getElementById('childLoginBtn');
+      btn.textContent = 'Loading your adventure…';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        mockLogin(name, name, 'child', null, selectedChildAvatar);
+      }, 700);
+    }
+
+    /* ── Live greeting update as child types ─────────────── */
+    document.getElementById('childName').addEventListener('input', function () {
+      const greet = document.querySelector('.child-welcome-text');
+      if (greet) {
+        greet.textContent = this.value.trim()
+          ? `Hi ${this.value.trim()}! Ready for a story?`
+          : "Hi there! What's your name?";
+      }
+    });
+
+    /* ── Enter key for parent password ───────────────────── */
+    document.getElementById('parentPassword').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleParentLogin();
+    });
+    document.getElementById('childName').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleChildLogin();
+    });
+
+    /* ── Forgot Password Modal ───────────────────────────── */
+    function openForgotModal() {
+      const overlay = document.getElementById('forgotOverlay');
+      overlay.style.display = 'flex';
+      document.getElementById('forgotDefault').style.display = 'block';
+      document.getElementById('forgotSuccess').style.display = 'none';
+      document.getElementById('forgotError').textContent = '';
+      document.getElementById('forgotEmail').value = '';
+      setTimeout(() => document.getElementById('forgotEmail').focus(), 100);
+    }
+
+    function closeForgotModal(e) {
+      if (e && e.target !== document.getElementById('forgotOverlay')) return;
+      document.getElementById('forgotOverlay').style.display = 'none';
+    }
+
+    async function sendResetLink() {
+      const email = document.getElementById('forgotEmail').value.trim();
+      const errEl = document.getElementById('forgotError');
+      const btn   = document.querySelector('#forgotDefault button');
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errEl.textContent = 'Please enter a valid email address.';
+        return;
+      }
+      errEl.textContent = '';
+      btn.textContent = 'Sending…';
+      btn.disabled = true;
+
+      try {
+        if (window._fbSendReset) {
+          await window._fbSendReset(email);
+        }
+        // Show success regardless (security best practice — don't reveal if email exists)
+        document.getElementById('forgotEmailSent').textContent = email;
+        document.getElementById('forgotDefault').style.display = 'none';
+        document.getElementById('forgotSuccess').style.display = 'block';
+      } catch (err) {
+        btn.textContent = 'Send Reset Link';
+        btn.disabled = false;
+        errEl.textContent = 'Something went wrong. Please try again.';
+        console.error('Reset error:', err);
+      }
+    }
+  </script>
+
+  <!-- Firebase Auth for password reset (module) -->
+  <script type="module">
+    import { auth } from './firebase-config.js';
+    import { sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+    window._fbSendReset = async (email) => {
+      await sendPasswordResetEmail(auth, email);
+    };
+  </script>
+
+  <script src="animations.js"></script>
+</body>
+</html>

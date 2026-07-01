@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script>
+    (function(){try{var u=JSON.parse(localStorage.getItem('currentUser'));if(!u)window.location.replace('login.html');}catch(e){window.location.replace('login.html');}})();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StoryMagic AI — Animated Storybook for Kids</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="animations.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    html, body { overflow: hidden; height: 100%; }
+    .dreamy-hero {
+      height: calc(100vh - 80px);
+      margin-top: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 32px 0;
+      box-sizing: border-box;
+      gap: 0;
+    }
+    .dreamy-hero * { text-align: center !important; }
+
+    .hero-badge-new { margin-bottom: 20px; margin-top: 0; }
+
+    .hero-main-title {
+      font-size: clamp(2.6rem, 4.5vw, 4rem) !important;
+      margin-bottom: 20px !important;
+      line-height: 1.2 !important;
+    }
+
+    .hero-subtitle-new {
+      font-size: 1.2rem !important;
+      line-height: 1.8 !important;
+      color: rgba(255,255,255,0.75) !important;
+      margin-bottom: 0 !important;
+    }
+
+    .dreamy-hero-buttons { margin-top: 48px; }
+
+    .hero-cta-btn {
+      font-size: 1.15rem !important;
+      padding: 16px 56px !important;
+      border-radius: 50px !important;
+      box-shadow: 0 8px 32px rgba(236,72,153,0.45) !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Layers -->
+  <div class="bg-stars"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Navigation -->
+  <nav class="nav-pill">
+    <a href="index.html" class="nav-pill-logo">
+      <img src="images/Logo.png" alt="StoryMagic Logo" class="nav-logo-img">
+    </a>
+    <div class="nav-pill-links">
+      <a href="index.html">Home</a>
+      <a href="characters.html">Characters</a>
+      <a href="library.html">Library</a>
+      <a href="parent.html">Parents</a>
+    </div>
+    <div class="nav-pill-auth"></div>
+  </nav>
+
+  <!-- Full-screen Hero -->
+  <div class="dreamy-hero">
+
+    <div class="hero-badge-new">AI-Powered Storytelling for Kids</div>
+
+    <h1 class="dreamy-title hero-main-title">
+      Discover <span class="hero-gradient-word">Magical Stories</span>
+      Created Just for Your Child
+    </h1>
+
+    <p class="hero-subtitle-new">
+      Every adventure is unique, safe &amp; made just for your little explorer.<br>
+      Choose a hero, pick a world, and let the magic begin!
+    </p>
+
+    <div class="dreamy-hero-buttons">
+      <a href="create.html" class="btn dreamy-btn-pink jelly-hover hero-cta-btn">Start Story</a>
+    </div>
+
+
+  </div>
+
+  <script src="auth.js"></script>
+  <script src="animations.js"></script>
+</body>
+</html>

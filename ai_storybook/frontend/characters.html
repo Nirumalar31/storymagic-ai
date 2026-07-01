@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StoryMagic AI — Choose Your Character</title>
+  <meta name="description" content="Pick your story hero — Luna, Sparky, Max, Rosie, Willow, or Dino!" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- Background Layers -->
+  <div class="bg-stars"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Navigation Header -->
+  <nav class="nav-pill">
+    <a href="index.html" class="nav-pill-logo">
+      <img src="images/Logo.png" alt="StoryMagic Logo" class="nav-logo-img">
+    </a>
+    <div class="nav-pill-links">
+      <a href="index.html">Home</a>
+      <a href="characters.html">Characters</a>
+      <a href="parent.html">Parents</a>
+    </div>
+    <div class="nav-pill-auth">
+      <!-- Logic in auth.js will fill this -->
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="page-wrapper">
+    <div class="chars-header" style="text-align: center; margin-bottom: 40px; margin-top: 40px;">
+      <h1 class="dreamy-title">Choose Your <span>Story Hero</span></h1>
+      <p style="color: rgba(255,255,255,0.8); font-size: 1.2rem; font-weight: 400;">Pick the character who will go on the adventure with you!</p>
+    </div>
+
+    <!-- 3 × 2 Character Grid -->
+    <div class="characters-grid" id="characterGrid" style="max-width: 1000px; padding: 0 24px;">
+      <!-- Luna -->
+      <div class="magic-card card-luna" data-char="Luna" data-name="Luna" data-img="images/Luna.webp" data-trait="✨ Magical Wizard" onclick="selectCharacter(this)">
+        <div class="char-img-wrap">
+          <img src="images/Luna.webp" alt="Luna the Wizard" loading="lazy" />
+        </div>
+        <div class="char-label">
+          <h3>Luna</h3>
+          <span class="trait-badge">✨ Wizard</span>
+        </div>
+      </div>
+
+      <!-- Sparky -->
+      <div class="magic-card card-sparky" data-char="Sparky" data-name="Sparky" data-img="images/Sparky.webp" data-trait="🔥 Brave Dragon" onclick="selectCharacter(this)">
+        <div class="char-img-wrap">
+          <img src="images/Sparky.webp" alt="Sparky the Dragon" loading="lazy" />
+        </div>
+        <div class="char-label">
+          <h3>Sparky</h3>
+          <span class="trait-badge">🔥 Dragon</span>
+        </div>
+      </div>
+
+      <!-- Max -->
+      <div class="magic-card card-max" data-char="Max" data-name="Max" data-img="images/Max.webp" data-trait="⚡ Adventurer" onclick="selectCharacter(this)">
+        <div class="char-img-wrap">
+          <img src="images/Max.webp" alt="Max the Adventurer" loading="lazy" />
+        </div>
+        <div class="char-label">
+          <h3>Max</h3>
+          <span class="trait-badge">⚡ Adventurer</span>
+        </div>
+      </div>
+
+      <!-- Rosie -->
+      <div class="magic-card card-rosie" data-char="Rosie" data-name="Rosie" data-img="images/Rosie.webp" data-trait="💖 Kind Heart" onclick="selectCharacter(this)">
+        <div class="char-img-wrap">
+          <img src="images/Rosie.webp" alt="Rosie the Kind" loading="lazy" />
+        </div>
+        <div class="char-label">
+          <h3>Rosie</h3>
+          <span class="trait-badge">💖 Kind</span>
+        </div>
+      </div>
+
+      <!-- Willow -->
+      <div class="magic-card card-willow" data-char="Willow" data-name="Willow" data-img="images/Willow.webp" data-trait="🌿 Nature Fairy" onclick="selectCharacter(this)">
+        <div class="char-img-wrap">
+          <img src="images/Willow.webp" alt="Willow the Fairy" loading="lazy" />
+        </div>
+        <div class="char-label">
+          <h3>Willow</h3>
+          <span class="trait-badge">🌿 Fairy</span>
+        </div>
+      </div>
+
+      <!-- Dino -->
+      <div class="magic-card card-dino" data-char="Dino" data-name="Dino" data-img="images/Dino.webp" data-trait="🦕 Dino Explorer" onclick="selectCharacter(this)">
+        <div class="char-img-wrap">
+          <img src="images/Dino.webp" alt="Dino the Explorer" loading="lazy" />
+        </div>
+        <div class="char-label">
+          <h3>Dino</h3>
+          <span class="trait-badge">🦕 Explorer</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selected Hero Banner -->
+    <div class="selected-hero-banner" id="selectedDisplay" style="display: none;">
+      <img src="" alt="" class="selected-avatar" id="selectedAvatar" />
+      <div class="selected-info">
+        <h3 id="selectedName" class="dreamy-title" style="font-size: 2.5rem; margin-bottom: 8px;">Hero</h3>
+        <p id="selectedTrait" style="color: var(--candy-yellow); font-weight: 500; font-size: 1.2rem; margin-bottom: 20px;">Ready for adventure!</p>
+        <a href="index.html" class="btn dreamy-btn-pink jelly-hover" style="font-size: 1.2rem;">🪄 Start Your Story</a>
+      </div>
+    </div>
+  </main>
+
+  <div id="particleContainer"></div>
+
+  <!-- Global Footer -->
+  <footer class="pro-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="images/Logo.png" alt="StoryMagic Logo" class="footer-logo-img">
+        <p>Making learning to read a magical, unforgettable <br> experience through personalized AI stories.</p>
+        <div class="footer-socials">
+          <a href="https://www.instagram.com/storymagic_ai?igsh=amZ4OW9lZWNyd21r&amp;utm_source=qr" target="_blank" class="footer-social-btn social-instagram" title="Instagram">
+            <img src="images/instagram.webp" alt="Instagram" class="social-icon-img"/>
+          </a>
+          <a href="https://www.tiktok.com/@storymagic_ai?_r=1&amp;_t=ZS-95WrXclgNGr" target="_blank" class="footer-social-btn social-tiktok" title="TikTok">
+            <img src="images/tik tok.webp" alt="TikTok" class="social-icon-img"/>
+          </a>
+          <a href="#" class="footer-social-btn social-youtube" title="YouTube">
+            <img src="images/youtube.png" alt="YouTube" class="social-icon-img"/>
+          </a>
+          <a href="#" class="footer-social-btn social-linkedin" title="LinkedIn">
+            <img src="images/linkedin.png" alt="LinkedIn" class="social-icon-img"/>
+          </a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="library.html">Library</a></li>
+            <li><a href="characters.html">Characters</a></li>
+            <li><a href="parent.html">Parents Dashboard</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 StoryMagic AI. All rights reserved. Created with ❤️ for young explorers.</p>
+    </div>
+  </footer>
+
+  <script src="auth.js"></script>
+  <script>
+    let selectedChar = localStorage.getItem('selectedChar') || '';
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (selectedChar) {
+        const saved = document.querySelector(`[data-char="${selectedChar}"]`);
+        if (saved) selectCharacter(saved);
+      }
+    });
+
+    function selectCharacter(el) {
+      document.querySelectorAll('.magic-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+
+      const char = el.dataset.char;
+      const name = el.dataset.name;
+      const img = el.dataset.img;
+      const trait = el.dataset.trait;
+
+      localStorage.setItem('selectedChar', char);
+      
+      document.getElementById('selectedAvatar').src = img;
+      document.getElementById('selectedAvatar').alt = name;
+      document.getElementById('selectedName').textContent = name;
+      document.getElementById('selectedTrait').textContent = trait;
+
+      const banner = document.getElementById('selectedDisplay');
+      banner.style.display = 'flex';
+      
+      spawnSparks(el);
+      
+      setTimeout(() => banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+    }
+
+    function spawnSparks(el) {
+      const rect = el.getBoundingClientRect();
+      const emojis = ['✨', '⭐', '💫', '🌟'];
+      for (let i = 0; i < 8; i++) {
+        const s = document.createElement('div');
+        s.className = 'spark';
+        s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        s.style.left = (rect.left + Math.random() * rect.width) + 'px';
+        s.style.top = (rect.top + Math.random() * rect.height) + 'px';
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 1000);
+      }
+    }
+  </script>
+</body>
+</html>

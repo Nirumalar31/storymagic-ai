@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script>
+    (function(){try{var u=JSON.parse(localStorage.getItem('currentUser'));if(!u)window.location.replace('login.html');}catch(e){window.location.replace('login.html');}})();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Your Story — StoryMagic AI</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="animations.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    html, body { overflow: hidden; height: 100%; }
+
+    /* ── Wizard shell ─────────────────────────── */
+    .wizard-wrap {
+      height: calc(100vh - 80px);
+      margin-top: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 24px 28px;
+      box-sizing: border-box;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ── Progress dots ────────────────────────── */
+    .wizard-progress {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: 28px;
+      flex-shrink: 0;
+    }
+    .wp-dot {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.18);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; color: rgba(255,255,255,0.4);
+      transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      flex-shrink: 0;
+    }
+    .wp-dot.active {
+      background: linear-gradient(135deg, #ec4899, #f97316);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(236,72,153,0.55);
+      transform: scale(1.15);
+    }
+    .wp-dot.done {
+      background: rgba(34,197,94,0.75);
+      border-color: transparent;
+      color: #fff;
+    }
+    .wp-line {
+      flex: 1; height: 2px;
+      background: rgba(255,255,255,0.12);
+      transition: background 0.3s;
+    }
+    .wp-line.done { background: rgba(34,197,94,0.5); }
+
+    /* ── Step panels ──────────────────────────── */
+    .wizard-step {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      width: 100%;
+      min-height: 0;
+      gap: 16px;
+    }
+    .wizard-step.active {
+      display: flex;
+      animation: fadeStep 0.3s ease;
+    }
+    @keyframes fadeStep {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .ws-label {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3.5vw, 2rem);
+      color: #fff;
+      text-align: center;
+      margin-bottom: 0;
+      text-shadow: 0 4px 16px rgba(168,85,247,0.4);
+      flex-shrink: 0;
+    }
+
+    /* ── Hero bar (step 1) ────────────────────── */
+    .hero-pick-row {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: rgba(5, 2, 20, 0.75);
+      border: 2.5px dashed rgba(236,72,153,0.6);
+      border-radius: 22px;
+      padding: 20px 24px;
+      cursor: pointer;
+      width: 100%;
+      box-sizing: border-box;
+      transition: all 0.3s;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .hero-pick-row:hover { background: rgba(10,4,30,0.85); border-color: rgba(236,72,153,0.95); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(236,72,153,0.25); }
+    .hero-avatar-circle {
+      width: 76px; height: 76px; border-radius: 50%;
+      background: linear-gradient(135deg, rgba(168,85,247,0.3), rgba(236,72,153,0.3));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.6rem; flex-shrink: 0;
+      box-shadow: 0 0 20px rgba(236,72,153,0.45);
+      border: 2.5px solid rgba(236,72,153,0.4);
+      overflow: hidden;
+    }
+    .hero-pick-info h3 { font-size: 1.2rem; font-weight: 800; color: #fff; margin: 0 0 5px; }
+    .hero-pick-info p  { font-size: 0.9rem; color: rgba(255,255,255,0.55); margin: 0; }
+    .hero-pick-arrow   { margin-left: auto; font-size: 1.4rem; color: rgba(255,255,255,0.4); }
+
+    /* ── Name input (step 2) ──────────────────── */
+    .name-big-input {
+      width: 100%;
+      background: rgba(5, 2, 20, 0.75);
+      border: 2.5px dashed rgba(236,72,153,0.6);
+      border-radius: 22px;
+      padding: 22px 28px;
+      font-size: 1.5rem;
+      color: #fff;
+      text-align: center;
+      outline: none;
+      box-sizing: border-box;
+      transition: all 0.3s;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .name-big-input::placeholder { color: rgba(255,255,255,0.35); font-size: 1.2rem; }
+    .name-big-input:focus { border-color: #ec4899; border-style: solid; background: rgba(5,2,20,0.90); box-shadow: 0 0 0 4px rgba(236,72,153,0.2), 0 8px 32px rgba(0,0,0,0.4); }
+
+    /* ── Age cards (step 3) ───────────────────── */
+    .age-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      width: 100%;
+    }
+    .age-big-card {
+      border-radius: 26px;
+      padding: 36px 16px 32px;
+      cursor: pointer;
+      text-align: center;
+      border: 3px solid transparent;
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .age-big-card:hover { transform: translateY(-8px) scale(1.03); }
+    .age-big-card.selected {
+      border-color: #fff;
+      box-shadow: 0 0 0 4px rgba(255,255,255,0.25), 0 16px 40px rgba(0,0,0,0.35);
+      transform: translateY(-8px) scale(1.05);
+    }
+    .age-big-card .ac-label { font-size: 1.4rem; font-weight: 900; color: #fff; margin-bottom: 6px; }
+    .age-big-card .ac-desc  { font-size: 0.9rem; color: rgba(255,255,255,0.82); }
+    .ac-yellow { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+    .ac-purple { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
+
+    /* ── Theme cards (step 4) ─────────────────── */
+    .theme-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+    }
+    .theme-big-card {
+      border-radius: 22px;
+      padding: 16px 10px 14px;
+      cursor: pointer;
+      text-align: center;
+      border: 3px solid transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .theme-big-card:hover { transform: translateY(-6px) scale(1.04); box-shadow: 0 16px 36px rgba(0,0,0,0.4); }
+    .theme-big-card.selected {
+      border-color: #fff;
+      box-shadow: 0 0 0 4px rgba(255,255,255,0.3), 0 16px 40px rgba(0,0,0,0.4);
+      transform: translateY(-5px) scale(1.06);
+    }
+    .theme-big-card .tc-name  { font-size: 1.4rem; font-weight: 900; color: #fff; letter-spacing: 0.5px; }
+    .tc-forest  { background: linear-gradient(135deg, #22c55e, #15803d); }
+    .tc-ocean   { background: linear-gradient(135deg, #0ea5e9, #1d4ed8); }
+    .tc-dino    { background: linear-gradient(135deg, #f97316, #b91c1c); }
+    .tc-mystery { background: linear-gradient(135deg, #7c3aed, #4338ca); }
+    .tc-kind    { background: linear-gradient(135deg, #ec4899, #9d174d); }
+    .tc-moral   { background: linear-gradient(135deg, #f59e0b, #b45309); }
+
+    /* ── Wizard navigation ────────────────────── */
+    .wizard-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding-top: 14px;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+    .wiz-btn {
+      padding: 14px 32px;
+      border-radius: 50px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+      letter-spacing: 0.3px;
+    }
+    .wiz-back {
+      background: rgba(5, 2, 20, 0.80);
+      border: 1.5px solid rgba(255,255,255,0.35);
+      color: rgba(255,255,255,0.9);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    }
+    .wiz-back:hover { background: rgba(15, 8, 40, 0.95); color: #fff; border-color: rgba(255,255,255,0.55); }
+    .wiz-back:disabled { opacity: 0.3; cursor: not-allowed; }
+    .wiz-next {
+      background: linear-gradient(135deg, #ec4899, #f97316);
+      color: #fff;
+      box-shadow: 0 8px 28px rgba(236,72,153,0.5);
+      padding: 14px 48px;
+    }
+    .wiz-next:hover { transform: scale(1.05); box-shadow: 0 12px 36px rgba(236,72,153,0.65); }
+    .wiz-step-counter {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    /* ── Loading spinner ──────────────────────── */
+    .loading-magic-circle {
+      position: relative; width: 130px; height: 130px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .magic-ring { position: absolute; border-radius: 50%; border: 3px solid transparent; }
+    .ring-1 { width:130px;height:130px;border-top-color:#ec4899;border-right-color:#ec4899;animation:spinRing 1.2s linear infinite; }
+    .ring-2 { width:96px;height:96px;border-top-color:#a855f7;border-left-color:#a855f7;animation:spinRing 1.8s linear infinite reverse; }
+    .ring-3 { width:62px;height:62px;border-bottom-color:#fbbf24;border-right-color:#fbbf24;animation:spinRing 1s linear infinite; }
+    @keyframes spinRing { to { transform: rotate(360deg); } }
+    .magic-wand-center { font-size: 2.2rem; animation: wandPulse 1s ease-in-out infinite; }
+    @keyframes wandPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.28)} }
+    .loading-tips { color:rgba(255,255,255,0.6); font-size:15px; margin-top:14px; transition:opacity 0.5s; }
+  </style>
+</head>
+<body>
+
+  <div class="bg-stars"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <nav class="nav-pill">
+    <a href="index.html" class="nav-pill-logo">
+      <img src="images/Logo.png" alt="StoryMagic Logo" class="nav-logo-img">
+    </a>
+    <div class="nav-pill-links">
+      <a href="index.html">Home</a>
+      <a href="characters.html">Characters</a>
+      <a href="library.html">Library</a>
+      <a href="parent.html">Parents</a>
+    </div>
+    <div class="nav-pill-auth"></div>
+  </nav>
+
+  <!-- ── Wizard ───────────────────────────────── -->
+  <div class="wizard-wrap">
+
+    <!-- Progress dots -->
+    <div class="wizard-progress">
+      <div class="wp-dot active" id="dot1">1</div>
+      <div class="wp-line" id="line1"></div>
+      <div class="wp-dot" id="dot2">2</div>
+      <div class="wp-line" id="line2"></div>
+      <div class="wp-dot" id="dot3">3</div>
+      <div class="wp-line" id="line3"></div>
+      <div class="wp-dot" id="dot4">4</div>
+    </div>
+
+    <!-- STEP 1 — Hero -->
+    <div class="wizard-step active" id="step1">
+      <div class="ws-label">Choose Your Hero</div>
+      <div id="heroBar" class="hero-pick-row" onclick="window.location.href='characters.html'">
+        <div class="hero-avatar-circle"><span id="heroEmoji">🧚</span></div>
+        <div class="hero-pick-info">
+          <h3 id="heroName">Pick your hero first!</h3>
+          <p id="heroSub">Tap here to go to the Characters page →</p>
+        </div>
+        <div class="hero-pick-arrow">→</div>
+      </div>
+    </div>
+
+    <!-- STEP 2 — Name -->
+    <div class="wizard-step" id="step2">
+      <div class="ws-label">What Is Your Name?</div>
+      <input class="name-big-input" id="childName" type="text"
+             placeholder="Type your name here... e.g. Leo" autocomplete="off" />
+    </div>
+
+    <!-- STEP 3 — Age -->
+    <div class="wizard-step" id="step3">
+      <div class="ws-label">How Old Are You?</div>
+      <div class="age-row">
+        <div class="age-big-card ac-yellow selected" data-age="4-6" onclick="selectAge(this,'4-6')">
+          <div class="ac-label">Ages 4–6</div>
+          <div class="ac-desc">Simple &amp; fun words</div>
+        </div>
+        <div class="age-big-card ac-purple" data-age="7-8+" onclick="selectAge(this,'7-8+')">
+          <div class="ac-label">Ages 7–8+</div>
+          <div class="ac-desc">Rich adventures</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4 — Theme -->
+    <div class="wizard-step" id="step4">
+      <div class="ws-label">Pick Your World!</div>
+      <div class="theme-row">
+        <div class="theme-big-card tc-forest"  data-theme="forest"   onclick="selectTheme(this,'forest')">
+          <div class="tc-name">Magic Forest</div>
+        </div>
+        <div class="theme-big-card tc-ocean"   data-theme="ocean"    onclick="selectTheme(this,'ocean')">
+          <div class="tc-name">Deep Ocean</div>
+        </div>
+        <div class="theme-big-card tc-dino"    data-theme="dinosaur" onclick="selectTheme(this,'dinosaur')">
+          <div class="tc-name">Dino Land</div>
+        </div>
+        <div class="theme-big-card tc-mystery" data-theme="mystery"  onclick="selectTheme(this,'mystery')">
+          <div class="tc-name">Mystery</div>
+        </div>
+        <div class="theme-big-card tc-kind"    data-theme="kindness" onclick="selectTheme(this,'kindness')">
+          <div class="tc-name">Kindness</div>
+        </div>
+        <div class="theme-big-card tc-moral"   data-theme="moral"    onclick="selectTheme(this,'moral')">
+          <div class="tc-name">Brave &amp; Bold</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="wizard-nav">
+      <button class="wiz-btn wiz-back" id="wizBackBtn" onclick="wizPrev()" disabled>Back</button>
+      <span class="wiz-step-counter" id="stepCounter">Step 1 of 4</span>
+      <button class="wiz-btn wiz-next" id="wizNextBtn" onclick="wizNext()">Next</button>
+    </div>
+
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay hidden" id="loadingOverlay">
+    <div class="loading-magic-circle">
+      <div class="magic-ring ring-1"></div>
+      <div class="magic-ring ring-2"></div>
+      <div class="magic-ring ring-3"></div>
+      <div class="magic-wand-center">🪄</div>
+    </div>
+    <div class="loading-text" style="margin-top:32px;">Weaving your story<span class="loading-dots"></span></div>
+    <div class="loading-tips" id="loadingTip">The magic is working ✨</div>
+  </div>
+
+  <div id="particleContainer"></div>
+
+  <script src="auth.js"></script>
+  <script>
+    /* ── Wizard state ─────────────────────────── */
+    let currentStep = 1;
+    const TOTAL = 4;
+
+    function showStep(n) {
+      for (let i = 1; i <= TOTAL; i++) {
+        document.getElementById('step' + i).classList.toggle('active', i === n);
+        const dot = document.getElementById('dot' + i);
+        dot.classList.toggle('active', i === n);
+        dot.classList.toggle('done',   i < n);
+        if (i < TOTAL) {
+          document.getElementById('line' + i).classList.toggle('done', i < n);
+        }
+      }
+      document.getElementById('wizBackBtn').disabled = n === 1;
+      document.getElementById('stepCounter').textContent = `Step ${n} of ${TOTAL}`;
+      const nextBtn = document.getElementById('wizNextBtn');
+      nextBtn.textContent = n === TOTAL ? 'Start My Adventure!' : 'Next';
+      nextBtn.style.background = n === TOTAL
+        ? 'linear-gradient(135deg,#22c55e,#16a34a)'
+        : 'linear-gradient(135deg,#ec4899,#f97316)';
+    }
+
+    function wizPrev() {
+      if (currentStep > 1) { currentStep--; showStep(currentStep); }
+    }
+
+    function wizNext() {
+      if (currentStep === 1) {
+        // no validation needed for hero (they may not have picked yet — just warn)
+      }
+      if (currentStep === 2) {
+        const name = document.getElementById('childName').value.trim();
+        if (!name) { document.getElementById('childName').focus(); document.getElementById('childName').style.borderColor = '#ef4444'; return; }
+        document.getElementById('childName').style.borderColor = '';
+      }
+      if (currentStep === TOTAL) {
+        generateStory();
+        return;
+      }
+      currentStep++;
+      showStep(currentStep);
+    }
+
+    /* ── Story logic (unchanged) ──────────────── */
+    let selectedTheme = '';
+    let selectedCharacter = '🧚';
+    let selectedAge = '4-6';
+
+    const heroImages = { Luna:'images/Luna.jpeg', Sparky:'images/Sparky.jpeg', Max:'images/Max.jpeg', King:'images/King.jpeg', Willow:'images/Willow.jpeg', Dino:'images/Dino.jpeg' };
+
+    // Pre-fill child name from parent settings
+    (function prefillChildName() {
+      const saved = localStorage.getItem('setting_childName');
+      if (saved) {
+        const inp = document.getElementById('childName');
+        if (inp) inp.value = saved;
+      }
+    })();
+
+    (function loadHeroBar() {
+      const char = localStorage.getItem('selectedChar');
+      if (char) {
+        selectedCharacter = char;
+        const imgSrc = heroImages[char];
+        const avatarDiv = document.getElementById('heroEmoji').parentElement;
+        if (imgSrc) {
+          avatarDiv.innerHTML = `<img src="${imgSrc}" alt="${char}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+        }
+        document.getElementById('heroName').textContent = char + ' is your hero!';
+        document.getElementById('heroSub').textContent  = 'Tap here to change your character →';
+        document.getElementById('heroBar').style.borderColor = 'rgba(236,72,153,0.8)';
+        document.getElementById('heroBar').style.borderStyle = 'solid';
+      }
+    })();
+
+    const loadingMessages = [
+      'Weaving your magical story ✨',
+      'Sprinkling fairy dust on the pages 🧚',
+      'Teaching the dragons to behave 🐉',
+      'Polishing the stars for your adventure 🌟',
+      'Asking the wise owl for ideas 🦉',
+      'Almost ready — hold on tight! 🚀',
+    ];
+    let tipInterval = null;
+    function startLoadingTips() {
+      let i = 0;
+      const el = document.getElementById('loadingTip');
+      tipInterval = setInterval(() => {
+        i = (i + 1) % loadingMessages.length;
+        el.style.opacity = 0;
+        setTimeout(() => { el.textContent = loadingMessages[i]; el.style.opacity = 1; }, 300);
+      }, 2200);
+    }
+    function stopLoadingTips() { clearInterval(tipInterval); }
+
+    function selectTheme(el, theme) {
+      document.querySelectorAll('.theme-big-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedTheme = theme;
+      spawnSparks(el, 6);
+    }
+
+    function selectAge(el, age) {
+      document.querySelectorAll('.age-big-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedAge = age;
+      spawnSparks(el, 5);
+    }
+
+    const ageMap = { '4-6': '4-5', '7-8+': '8' };
+
+    async function generateStory() {
+      const nameInput = document.getElementById('childName').value.trim();
+      if (!nameInput) { currentStep = 2; showStep(2); document.getElementById('childName').focus(); return; }
+      if (!selectedTheme) { alert("Please pick a story world!"); return; }
+
+      document.getElementById('loadingOverlay').classList.remove('hidden');
+      startLoadingTips();
+
+      const mappedAge = ageMap[selectedAge] || selectedAge;
+      const payload = { name: nameInput, prompt: "a fun adventure", theme: selectedTheme, character: selectedCharacter, age: mappedAge };
+
+      try {
+        const res = await fetch('http://127.0.0.1:5000/generate-story', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        localStorage.setItem('storyData', JSON.stringify({
+          story: data.pages || data.story,
+          title: data.title || `${nameInput}'s ${titleify(selectedTheme)} Adventure`,
+          theme: selectedTheme, character: selectedCharacter,
+          name: nameInput, age: mappedAge,
+          moral: data.moral || '', wrongMorals: data.wrongMorals || [], quiz: data.quiz || null
+        }));
+        window.location.href = 'http://127.0.0.1:5000/story';
+      } catch (err) {
+        const fallback = buildFallbackStory(nameInput, selectedTheme, selectedCharacter);
+        localStorage.setItem('storyData', JSON.stringify(fallback));
+        document.getElementById('loadingOverlay').classList.add('hidden');
+        stopLoadingTips();
+        window.location.href = 'story.html';
+      }
+    }
+
+    function titleify(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : 'Magical'; }
+
+    function spawnSparks(el, count = 5) {
+      const rect = el.getBoundingClientRect();
+      const emojis = ['✨', '⭐', '💫', '🌟', '🎉'];
+      for (let i = 0; i < count; i++) {
+        const spark = document.createElement('div');
+        spark.className = 'spark';
+        spark.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        spark.style.left = (rect.left + Math.random() * rect.width) + 'px';
+        spark.style.top  = (rect.top  + Math.random() * rect.height) + 'px';
+        spark.style.animationDelay = (Math.random() * 0.3) + 's';
+        document.body.appendChild(spark);
+        setTimeout(() => spark.remove(), 1000);
+      }
+    }
+
+    (function spawnParticles() {
+      const items = ['⭐','🌟','✨','💫','🔮','🌈','🎈','🦋'];
+      const container = document.getElementById('particleContainer');
+      setInterval(() => {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.textContent = items[Math.floor(Math.random() * items.length)];
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.fontSize = (14 + Math.random() * 16) + 'px';
+        const dur = 8 + Math.random() * 10;
+        p.style.animationDuration = dur + 's';
+        p.style.animationDelay = Math.random() * 2 + 's';
+        container.appendChild(p);
+        setTimeout(() => p.remove(), (dur + 2) * 1000);
+      }, 1200);
+    })();
+
+    function buildFallbackStory(name, theme, char) {
+      const stories = {
+        forest: {
+          '4-5': { title:`${name} in the Magic Forest`, pages:[`${name} walked into the big green forest. ${char} hopped along too! The trees were tall and the flowers were bright. "I love it here!" said ${name}.`,`A little bunny sat by a tree crying. "I can't find my home!" it said. ${name} felt sorry for the bunny. "We will help you find it!" said ${char}.`,`They walked slowly and looked and looked. Then they saw a cosy burrow under a big oak tree. "That's it!" cried the bunny. ${name} gave the bunny a warm hug. Everyone was so happy!`], moral:"Helping a friend find their way home is a wonderful thing to do!", wrongMorals:["It is best to stay home and not help.","Only grown-ups can help lost animals."], quiz:{q:`Who did ${name} help in the forest?`,a:"A lost bunny!",wrong:["A big bear","A green frog","A red bird"]}},
+          '6-7': { title:`${name} & The Magical Forest Explorer`, pages:[`One sunny morning, ${name} discovered a glowing compass hidden in the backyard. The world dissolved into golden leaves! ${name} stood at the edge of the Magical Forest. ${char} popped out of a hollow log.`,`The compass pointed toward a sparkling river where a sad mushroom sat. "The water keeps sweeping away my bridge!" it cried. "I need to get to the giant treehouse."`,`${name} gathered flat stones and sticks. With careful planning they rebuilt the bridge. The mushroom cheered and gave them a glowing acorn!`,`Inside the treehouse a wise owl waited. "You showed great empathy," the owl said. "You are a true Forest Explorer."`], moral:"Helping others in need is a wonderful way to make friends!", wrongMorals:["Let others solve their own problems.","Explorers should always go alone."], quiz:{q:`What did ${name} rebuild?`,a:"A bridge!",wrong:["A house","A boat","A ladder"]}},
+          '8': { title:`${name} and the Lost Baby Owl`, pages:[`After a stormy night, ${name} and ${char} were exploring the forest when they heard a small, frightened hoot from under a fallen branch. A baby owl sat alone, his nest knocked down by the wind. "I can't find my way home," he sniffled. ${name} knelt down and promised to help.`,`The first idea was to lift the owl back up using a rope, but the branch was too high and the owl was too scared to be pulled. A flicker of doubt crept in — what if this couldn't be fixed? ${char} reminded ${name} that good plans sometimes need a second try.`,`A family of squirrels noticed the trouble and tucked extra leaves between the branches to help it hold. At last the new nest stayed put. The baby owl hopped in, fluffed his wings, and let out the happiest hoot ${name} had ever heard. Asking for help, ${name} realised, wasn't giving up. It was just being smart.`], moral:"Trying again — and asking for help when you need it — is what turns a hard problem into a happy ending.", wrongMorals:["Asking for help means you have failed.","If a plan doesn't work the first time, it's better to stop trying."], quiz:{q:`Why did ${name} keep trying to build the nest?`,a:"So the owl wouldn't be without a home.",wrong:["There was a prize for finishing","The owl flew away forever","A grown-up said so"]}}
+        },
+        ocean: {
+          '4-5': { title:`${name} Under the Sea`, pages:[`${name} put on blue flippers and jumped into the warm clear sea. ${char} swam right next to them. They saw orange fish and a big purple crab. "It is so beautiful!" said ${name}.`,`A tiny starfish was crying on a pink rock. "I am lost! I can't find my coral home!" "Don't worry," said ${name}. "We will find it for you!" said ${char}.`,`They swam slowly and looked all around. There! A big purple coral house! "That's my home!" the starfish cheered. ${name} smiled the biggest smile!`], moral:"Helping a friend find their way home is the kindest thing!", wrongMorals:["Fish don't need help from humans.","The sea is too scary."], quiz:{q:"Who needed help?",a:"A little starfish!",wrong:["A blue whale","A red crab","A green turtle"]}},
+          '6-7': { title:`The Underwater Kingdom Quest`, pages:[`${name} found a magical seashell. Whispering the secret word, ${name} and ${char} dived into a glowing Underwater Kingdom!`,`A young mermaid swam over. "The Ocean's Heartlight has gone dark! We need brave explorers to find the magical pearls!"`,`It was dark in the trench and ${name} felt scared. But taking a deep breath, they swam bravely down. A glowing sea turtle guided their way.`,`Deep in the coral cave, they found the missing pearls. The Heartlight blazed, flooding the ocean with colour. The mermaid gave ${name} an Honorary Explorer Badge.`], moral:"Courage is doing the brave thing even when you're scared!", wrongMorals:["The ocean should never be explored.","Brave explorers never feel scared."], quiz:{q:"Which animal guided you?",a:"A glowing sea turtle!",wrong:["A dolphin","An octopus","A clownfish"]}},
+          '8': { title:`${name} and the Tangled Dolphin`, pages:[`${name} and ${char} were snorkelling near the reef when they spotted a young dolphin thrashing weakly, its fin caught in a clump of old fishing net. Panic flashed in its dark eyes. ${name}'s heart pounded — this felt bigger than anything they'd handled before.`,`The first attempt to tug the net loose only tightened it further. Taking a slow breath, ${name} remembered something from a nature show — staying calm helps a scared animal trust you. ${name} floated quietly nearby until the dolphin's breathing settled, then worked one loop of net free at a time.`,`It took three more careful tries before the last loop finally slipped away. The dolphin shot upward for a joyful breath, circled ${name} once, then leapt high into the sunlight. Floating back to shore, ${name} felt shaky but full of quiet pride — proud of being patient enough to get it right.`], moral:"Real courage is staying calm and patient, even when the first try doesn't work.", wrongMorals:["The fastest solution is always the best one.","Wild animals should always be left completely alone."], quiz:{q:`Why did ${name} stop pulling so hard?`,a:"Pulling hard scared the dolphin.",wrong:["The net was just seaweed","It was time to go home",`${name} got too tired`]}}
+        },
+        kindness: {
+          '4-5': { title:`${name}'s Kind Day`, pages:[`${name} and ${char} went to the park. They saw a small girl standing alone. She looked very sad. "What is wrong?" asked ${name}.`,`"I dropped my ice cream and now I have none," said the girl. ${name} shared their own ice cream! "Here, have some of mine!" The girl's face lit up like the sun!`,`They played together all afternoon. When it was time to go home, ${name} felt warm and happy inside. Being kind feels really good!`], moral:"Sharing what you have makes both you and your friend happy!", wrongMorals:["Keep treats for yourself.","Never talk to strangers."], quiz:{q:`What did ${name} share?`,a:"Their ice cream!",wrong:["A ball","A sticker","A flower"]}},
+          '6-7': { title:`The Kindness Treasure Hunt`, pages:[`The mayor called upon ${name} and ${char} for a special mission — the Kindness Treasure Hunt! "Find the three hidden Kindness Gems!"`,`At the library, a child couldn't reach a book. ${name} helped and ping! A glowing blue Kindness Gem appeared.`,`At the playground, two friends argued over a swing. ${name} suggested taking turns. They agreed and laughed. Ping! A pink gem appeared!`,`${name} shared their sandwich with a hungry stray cat. The golden Kindness Gem appeared. "The treasure was in your heart all along!" smiled the mayor.`], moral:"Kindness is the greatest treasure — sharing it makes everyone richer!", wrongMorals:["Winning matters more than how you win.","Only grown-ups can be truly kind."], quiz:{q:`How did ${name} earn the pink gem?`,a:"By helping two friends share the swing!",wrong:["Found it buried","Bought it","Solved a puzzle"]}},
+          '8': { title:`${name} and the Quiet New Kid`, pages:[`A new student named Theo joined ${name}'s class, sitting alone at lunch every single day. ${name} wanted to say hello but felt a strange flutter of nerves — what if Theo didn't want to talk?`,`${name}'s first attempt was a loud, cheerful "Hey, wanna sit with us?" shouted across the cafeteria. Theo flinched. Instead of giving up, ${name} quietly noticed that Theo always doodled dragons in his notebook.`,`The next day, ${name} sat down nearby and asked softly, "Did you draw that dragon? It looks awesome." Theo's face lit up, and soon they were both laughing over silly dragon names. The slower, gentler way had worked far better.`], moral:"Kindness works best when you take the time to notice what someone really needs.", wrongMorals:["If someone doesn't want to be friends right away, stop trying.","Being the loudest person always makes others feel comfortable."], quiz:{q:"Why did the second try work better?",a:"It noticed what Theo liked.",wrong:["A teacher assigned them","Theo got a gift","It was louder"]}}
+        },
+        dinosaur: {
+          '4-5': { title:`${name} Meets Rex!`, pages:[`${name} looked out the window and saw something amazing — a little green dinosaur! "Hello! I am Rex!" he said. He had big round eyes and a tiny tail. "Hello, Rex!" said ${name}.`,`Rex had lost his favourite red ball. His lip wobbled. "I can't find it anywhere!" "Don't worry," said ${name}. "We will all look together!" said ${char}.`,`They looked under flowers. They looked behind the big rock. There it was — the red ball! "Hooray!" Rex did a happy dinosaur dance! ${name} laughed and laughed.`], moral:"Looking for something together is always better than looking alone!", wrongMorals:["Dinosaurs are too scary to talk to.","Lost things can never be found."], quiz:{q:"What did Rex lose?",a:"His favourite red ball!",wrong:["His hat","His lunch","His toy rocket"]}},
+          '6-7': { title:`${name} & The Friendly T-Rex`, pages:[`"ROAARR!" ${name} jumped. The backyard had turned into a prehistoric jungle! A tiny T-Rex named Rex sat eating cookies. "I lost my bouncy ball in the Volcano of Bubbles. Help?"`,`They hiked past sleeping triceratops. The volcano bubbled with rainbow soapy bubbles! Using a giant palm leaf, ${name} fanned the bubbles aside.`,`There was the shiny red ball! Rex wiggled his tiny arms and did a full dinosaur dance. He shared his last cookie with ${name}.`,`"You're the best friend a dinosaur could have," Rex said. ${name} smiled — even the most fearsome-looking creatures just want a friend.`], moral:"Appearances can be deceiving — fearsome creatures often just need a good friend!", wrongMorals:["Dinosaurs belong only in museums.","Big creatures must always be avoided."], quiz:{q:"What came out of the volcano?",a:"Rainbow bubbles!",wrong:["Hot steam","Lava rocks","Confetti"]}},
+          '8': { title:`${name} and the Littlest Triceratops`, pages:[`While exploring a hidden valley, ${name} and ${char} found a baby triceratops stumbling alone through the ferns, calling out in small, worried grunts. Its family was nowhere in sight.`,`${name}'s first plan — following footprints — failed when the trail vanished at a rocky stream. Thinking harder, ${name} noticed the baby kept turning toward a low rumbling sound in the distance. Wading across the stream, ${name} followed the sound instead.`,`Past a ridge of tall rocks, an entire herd of triceratops looked up as the baby trotted excitedly toward them. Its mother curled protectively around her baby. Sometimes you have to trust a different kind of clue.`], moral:"When your first plan doesn't work, look for a new kind of clue instead of giving up.", wrongMorals:["If you can't find footprints, there's no way to track anything.","Wild animals always find their own way home."], quiz:{q:`Why did ${name} follow the rumbling sound?`,a:"The footprints had washed away.",wrong:["The footprints led in circles","The dinosaur gave directions","It heard treasure nearby"]}}
+        },
+        mystery: {
+          '4-5': { title:`${name}'s Mystery Box`, pages:[`${name} found a little box tied with a golden ribbon. "What is inside?" said ${name}. ${char} shook it gently. Rattle rattle! Inside was a tiny rolled-up map!`,`The map had a big red X. "That's a treasure map!" shouted ${name}. They ran outside as fast as they could. The X was right under the big apple tree!`,`Buried under the tree was a jar full of sparkly gold and silver stones. "Treasure!" laughed ${name}. ${char} did a big happy dance. They shared the stones with all their friends!`], moral:"The best treasure is the kind you can share with everyone!", wrongMorals:["Treasure should always be kept secret.","Maps are only for grown-ups."], quiz:{q:"Where was the treasure hidden?",a:"Under the apple tree!",wrong:["In the attic","Behind the shed","Under the kitchen"]}},
+          '6-7': { title:`The Great Mystery Box`, pages:[`${name} found a glowing box: "DO NOT OPEN UNLESS YOU LIKE SILLY THINGS." Of course they opened it. Whoosh! They landed on a cloud of pink cotton candy where a dog in a top hat said "Welcome to Sillyville!"`,`A giant flying pancake swooped past and stole the dog's top hat. "Oh no, my formal wear!" the dog cried. ${name} spotted a marshmallow springboard nearby.`,`${name} bounced high, grabbed the hat, and returned it. The pancake apologised — it just wanted to look smart. ${name} suggested sharing the hat on alternate days.`,`The dog gave ${name} a golden jellybean. "You saved the day and helped the pancake too!" The very best adventures really are the wonderfully silly ones.`], moral:"Bravery and creative thinking can turn any silly problem into a happy solution!", wrongMorals:["Silly problems aren't worth solving.","The fastest solution is always right."], quiz:{q:"What stole the dog's hat?",a:"A giant flying pancake!",wrong:["A cheeky monkey","A runaway balloon","A rain cloud"]}},
+          '8': { title:`${name} and the Box with Three Locks`, pages:[`In the dusty attic of their grandmother's house, ${name} and ${char} found an old wooden box with three strange locks and a note: "Only those who are patient may open me." The first lock snapped shut tighter when ${name} tugged too hard.`,`Looking closer, ${name} noticed tiny symbols: a sun, a moon, and a star. Turning the first lock toward the sun clicked it open. The second needed turning the opposite way first. The third needed both other locks held open at once.`,`It took four tries before — click — the lid finally lifted. Inside was a faded letter from ${name}'s great-grandmother, full of kind words for whoever found it. The box had asked for patience instead of strength.`], moral:"Some of the best things in life can't be rushed — they ask for patience instead of force.", wrongMorals:["If something is locked, it's always better to force it open.","Old things in attics are never worth the effort."], quiz:{q:`Why couldn't ${name} open the third lock right away?`,a:"It needed the other two locks held open.",wrong:["The box was empty","The lock was broken","The key was hidden elsewhere"]}}
+        },
+        moral: {
+          '4-5': { title:`${name} Tries Again`, pages:[`${name} was building a very tall tower with coloured blocks. But — crash! It fell down! ${name} felt like crying. "Don't give up!" said ${char} kindly. "Try one more time!"`,`${name} took a big breath and tried again. Crash! It fell again! But ${name} did not stop. "One more time!" This time they put the biggest blocks at the bottom and the smallest at the top.`,`The tower went up and up — and it stayed! "I DID IT!" shouted ${name}. ${char} gave a great big hug. Trying again is always, always worth it!`], moral:"Every time you try again, you get a little bit stronger and wiser!", wrongMorals:["If something falls, stop and give up.","Only perfect people feel proud."], quiz:{q:`What did ${name} build?`,a:"A tall tower!",wrong:["A bridge","A sandcastle","A little house"]}},
+          '6-7': { title:`Luna Learns to Try Again`, pages:[`${name} and ${char} met Luna at the Grand Sparkle Talent Show. She desperately wanted to perform her magic dance but kept falling. "The important thing is to get back up and try again," ${name} said gently.`,`${name} offered to practise the dance with Luna, counting the steps aloud. They practised everywhere. Every time Luna fell, ${name} cheered her back up.`,`When the talent show began, Luna stumbled once — but she remembered ${name}'s words, stood straight up, and finished with a spectacular magical spin that made lights flash gold.`,`The crowd roared with applause. "Thank you for believing in me." They both learned that the real magic isn't the perfect performance — it's the courage to keep going.`], moral:"Mistakes are how we learn — the real magic is getting back up and trying again!", wrongMorals:["If it's truly difficult, it isn't right for you.","Real talent means never making mistakes."], quiz:{q:"What was Luna performing?",a:"A magic dance!",wrong:["A song","A juggling routine","A poem"]}},
+          '8': { title:`${name} and the Wobbly Wheels`, pages:[`${name} had begged for a bicycle all year, but the first time sitting on it, the wheels wobbled wildly and ${name} tumbled into the grass within seconds. Cheeks burning, ${name} glanced around to check if anyone had seen.`,`${char} cheered from the sidewalk, "That was a great first try!" ${name} wasn't so sure — five more attempts ended in five more tumbles. On the seventh try, ${name} noticed something — looking ahead at the mailbox instead of down at the wheel kept things steadier.`,`By the tenth attempt, ${name} wasn't thinking about falling anymore, just pedalling faster, hair streaming back, laughing out loud. The falling hadn't been the failure. Quitting after the first tumble would have been.`], moral:"Every attempt — even the wobbly ones — teaches you something that gets you closer to succeeding.", wrongMorals:["If you fall on your first try, you're not good at something.","Only naturally talented people can learn new skills."], quiz:{q:`What helped ${name} finally ride well?`,a:"Looking ahead instead of down.",wrong:["Pure luck","A different, easier bike","Someone held it steady"]}}
+        }
+      };
+
+      const themeStories = stories[theme] || stories['forest'];
+      const ageKey = ageMap[selectedAge] || selectedAge;
+      const ageStory = themeStories[ageKey] || Object.values(themeStories)[0];
+      return {
+        story: ageStory.pages, title: ageStory.title, theme, character: char,
+        name, age: ageKey, moral: ageStory.moral, wrongMorals: ageStory.wrongMorals,
+        quiz: { q: ageStory.quiz.q, a: ageStory.quiz.a, wrong: ageStory.quiz.wrong || ['Something different','Another answer','A different choice'] }
+      };
+    }
+  </script>
+  <script src="animations.js"></script>
+</body>
+</html>

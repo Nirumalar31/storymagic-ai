@@ -1,0 +1,537 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script>
+    (function(){try{var u=JSON.parse(localStorage.getItem('currentUser'));if(!u)window.location.replace('login.html');}catch(e){window.location.replace('login.html');}})();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StoryMagic AI — Choose Your Character</title>
+  <meta name="description" content="Pick your story hero — Luna, Sparky, Max, Rosie, Willow, or Dino!" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="animations.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Three.js import map (GLB / Mixamo character viewer) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <style>
+    /* ── 3D card viewer ─────────────────────────────────── */
+    .char-img-wrap {
+      position: relative;
+      overflow: hidden;
+    }
+    .char-3d-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    .char-loading {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
+    }
+    .char-loading::after {
+      content: '';
+      width: 28px; height: 28px;
+      border: 2.5px solid rgba(255,255,255,0.15);
+      border-top-color: rgba(255,255,255,0.6);
+      border-radius: 50%;
+      animation: charSpin 0.9s linear infinite;
+    }
+    @keyframes charSpin { to { transform: rotate(360deg); } }
+
+    /* ── Selected banner 3D viewer ──────────────────────── */
+    .banner-3d-wrap {
+      position: relative;
+      width: 200px; height: 320px;
+      flex-shrink: 0;
+    }
+    .selected-avatar {
+      width: 100%; height: 100%;
+      object-fit: contain;
+      border-radius: 20px;
+      transition: opacity 0.4s ease;
+    }
+    #bannerCanvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      border-radius: 20px;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    /* ── Per-character glow colours ─────────────────────── */
+    .card-luna   { --glow: #fbbf24; }
+    .card-sparky { --glow: #f97316; }
+    .card-max    { --glow: #14b8a6; }
+    .card-rosie  { --glow: #ec4899; }
+    .card-willow { --glow: #22c55e; }
+    .card-dino   { --glow: #eab308; }
+
+    .magic-card {
+      border: 1.5px solid rgba(255,255,255,0.1);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    }
+    .magic-card:hover {
+      border-color: rgba(255,255,255,0.25);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+      transform: translateY(-8px) scale(1.03);
+    }
+
+    /* ── Glowing inner top edge (colour rim) ─────────────── */
+    .magic-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--glow, #fff) 25%, transparent) 0%,
+        transparent 40%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-stars"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <nav class="nav-pill">
+    <a href="index.html" class="nav-pill-logo">
+      <img src="images/Logo.png" alt="StoryMagic Logo" class="nav-logo-img">
+    </a>
+    <div class="nav-pill-links">
+      <a href="index.html">Home</a>
+      <a href="characters.html">Characters</a>
+      <a href="parent.html">Parents</a>
+    </div>
+    <div class="nav-pill-auth"></div>
+  </nav>
+
+  <main class="page-wrapper">
+    <div class="chars-header" style="text-align:center; margin: 40px 0;">
+      <h1 class="dreamy-title">Choose Your <span>Story Hero</span></h1>
+      <p style="color:rgba(255,255,255,0.8); font-size:1.1rem; font-weight:400;">Pick the character who will go on the adventure with you!</p>
+    </div>
+
+    <!-- 3×2 Character Grid -->
+    <div class="characters-grid" id="characterGrid" style="max-width:1000px; padding:0 24px;">
+
+      <!-- Luna -->
+      <div class="magic-card card-luna"
+           data-char="Luna" data-name="Luna"
+           data-img="images/Luna.webp" data-trait="Magical Wizard"
+           data-glb="models/Luna.glb" data-scale="1.6"
+           onclick="selectCharacter(this)">
+        <div class="char-img-wrap">
+          <canvas class="char-3d-canvas"></canvas>
+          <div class="char-loading"></div>
+        </div>
+        <div class="char-label">
+          <h3>Luna</h3>
+          <span class="trait-badge">Wizard</span>
+        </div>
+      </div>
+
+      <!-- Sparky -->
+      <div class="magic-card card-sparky"
+           data-char="Sparky" data-name="Sparky"
+           data-img="images/Sparky.webp" data-trait="Brave Dragon"
+           data-glb="models/dragon.glb" data-scale="1.7"
+           onclick="selectCharacter(this)">
+        <div class="char-img-wrap">
+          <canvas class="char-3d-canvas"></canvas>
+          <div class="char-loading"></div>
+        </div>
+        <div class="char-label">
+          <h3>Sparky</h3>
+          <span class="trait-badge">Dragon</span>
+        </div>
+      </div>
+
+      <!-- Max -->
+      <div class="magic-card card-max"
+           data-char="Max" data-name="Max"
+           data-img="images/Max.webp" data-trait="Adventurer"
+           data-glb="models/adventurer.glb" data-scale="1.4"
+           onclick="selectCharacter(this)">
+        <div class="char-img-wrap">
+          <canvas class="char-3d-canvas"></canvas>
+          <div class="char-loading"></div>
+        </div>
+        <div class="char-label">
+          <h3>Max</h3>
+          <span class="trait-badge">Adventurer</span>
+        </div>
+      </div>
+
+      <!-- Rosie -->
+      <div class="magic-card card-rosie"
+           data-char="King" data-name="King"
+           data-img="images/Rosie.webp" data-trait="Kind Heart"
+           data-glb="models/kind.glb" data-scale="2.2"
+           onclick="selectCharacter(this)">
+        <div class="char-img-wrap">
+          <canvas class="char-3d-canvas"></canvas>
+          <div class="char-loading"></div>
+        </div>
+        <div class="char-label">
+          <h3>King</h3>
+          <span class="trait-badge">Kind</span>
+        </div>
+      </div>
+
+      <!-- Willow -->
+      <div class="magic-card card-willow"
+           data-char="Willow" data-name="Willow"
+           data-img="images/Willow.webp" data-trait="Nature Fairy"
+           data-glb="models/fairy.glb" data-scale="1.6"
+           onclick="selectCharacter(this)">
+        <div class="char-img-wrap">
+          <canvas class="char-3d-canvas"></canvas>
+          <div class="char-loading"></div>
+        </div>
+        <div class="char-label">
+          <h3>Willow</h3>
+          <span class="trait-badge">Fairy</span>
+        </div>
+      </div>
+
+      <!-- Dino -->
+      <div class="magic-card card-dino"
+           data-char="Dino" data-name="Dino"
+           data-img="images/Dino.webp" data-trait="Dino Explorer"
+           data-glb="models/explorer.glb" data-scale="1.4"
+           onclick="selectCharacter(this)">
+        <div class="char-img-wrap">
+          <canvas class="char-3d-canvas"></canvas>
+          <div class="char-loading"></div>
+        </div>
+        <div class="char-label">
+          <h3>Dino</h3>
+          <span class="trait-badge">Explorer</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Selected Hero Banner -->
+    <div class="selected-hero-banner" id="selectedDisplay" style="display:none;">
+      <div class="banner-3d-wrap">
+        <img src="" alt="" class="selected-avatar" id="selectedAvatar"/>
+        <canvas id="bannerCanvas"></canvas>
+      </div>
+      <div class="selected-info">
+        <h3 id="selectedName" class="dreamy-title" style="font-size:2.5rem; margin-bottom:8px;">Hero</h3>
+        <p id="selectedTrait" style="color:var(--candy-yellow); font-weight:500; font-size:1.2rem; margin-bottom:20px;">Ready for adventure!</p>
+        <a href="create.html" class="btn dreamy-btn-pink jelly-hover" style="font-size:1.2rem;">Start Your Story</a>
+      </div>
+    </div>
+  </main>
+
+  <div id="particleContainer"></div>
+
+  <footer class="pro-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="images/Logo.png" alt="StoryMagic Logo" class="footer-logo-img">
+        <p>Making learning to read a magical, unforgettable <br> experience through personalized AI stories.</p>
+        <div class="footer-socials">
+          <a href="https://www.instagram.com/storymagic_ai?igsh=amZ4OW9lZWNyd21r&utm_source=qr" target="_blank" class="footer-social-btn social-instagram" title="Instagram">
+            <img src="images/instagram.webp" alt="Instagram" class="social-icon-img"/>
+          </a>
+          <a href="https://www.tiktok.com/@storymagic_ai?_r=1&_t=ZS-95WrXclgNGr" target="_blank" class="footer-social-btn social-tiktok" title="TikTok">
+            <img src="images/tik tok.webp" alt="TikTok" class="social-icon-img"/>
+          </a>
+          <a href="https://www.youtube.com/@supportstorymagicai" target="_blank" class="footer-social-btn social-youtube" title="YouTube">
+            <img src="images/youtube.png" alt="YouTube" class="social-icon-img"/>
+          </a>
+          <a href="https://www.linkedin.com/in/storymagic-ai" class="footer-social-btn social-linkedin" title="LinkedIn">
+            <img src="images/linkedin.png" alt="LinkedIn" class="social-icon-img"/>
+          </a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="library.html">Library</a></li>
+            <li><a href="characters.html">Characters</a></li>
+            <li><a href="parent.html">Parents Dashboard</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="terms.html">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 StoryMagic AI by Nirumalar Santharan. All rights reserved. Created with ❤️ for young explorers.</p>
+    </div>
+  </footer>
+
+  <script src="auth.js"></script>
+
+  <!-- ── Character selection (non-module) ───────────────── -->
+  <script>
+    let selectedChar = localStorage.getItem('selectedChar') || '';
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (selectedChar) {
+        const saved = document.querySelector(`[data-char="${selectedChar}"]`);
+        if (saved) selectCharacter(saved);
+      }
+    });
+
+    function selectCharacter(el) {
+      document.querySelectorAll('.magic-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+
+      const char  = el.dataset.char;
+      const name  = el.dataset.name;
+      const img   = el.dataset.img;
+      const trait = el.dataset.trait;
+      const glb   = el.dataset.glb;
+
+      localStorage.setItem('selectedChar', char);
+
+      const banner = document.getElementById('selectedDisplay');
+      const avatar = document.getElementById('selectedAvatar');
+      const bannerCanvas = document.getElementById('bannerCanvas');
+
+      document.getElementById('selectedName').textContent  = name;
+      document.getElementById('selectedTrait').textContent = trait;
+
+      // Load 3D model in banner if available, else show image
+      if (glb && typeof window.loadBannerModel === 'function') {
+        avatar.style.opacity = '0';
+        bannerCanvas.style.display = 'block';
+        window.loadBannerModel(glb, () => {
+          bannerCanvas.style.opacity = '1';
+        });
+      } else {
+        avatar.src = img;
+        avatar.alt = name;
+        avatar.style.opacity = '1';
+        bannerCanvas.style.display = 'none';
+      }
+
+      banner.style.display = 'flex';
+      spawnSparks(el);
+      setTimeout(() => banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+    }
+
+    function spawnSparks(el) {
+      const rect   = el.getBoundingClientRect();
+      const emojis = ['✨', '⭐', '💫', '🌟'];
+      for (let i = 0; i < 8; i++) {
+        const s = document.createElement('div');
+        s.className = 'spark';
+        s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        s.style.left  = (rect.left + Math.random() * rect.width)  + 'px';
+        s.style.top   = (rect.top  + Math.random() * rect.height) + 'px';
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 1000);
+      }
+    }
+  </script>
+
+  <!-- ── Three.js GLB viewer (module) ───────────────────── -->
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+    const loader = new GLTFLoader();
+
+    function pickAnim(animations) {
+      if (!animations.length) return null;
+      return animations.find(a => /idle|stand|wait|loop/i.test(a.name)) || animations[0];
+    }
+
+    /* ── Shared helper: normalise + centre a loaded model ── */
+    function fitModel(model, scaleTarget = 1.4) {
+      const box    = new THREE.Box3().setFromObject(model);
+      const size   = box.getSize(new THREE.Vector3());
+      const min    = box.min;
+      const center = box.getCenter(new THREE.Vector3());
+
+      // Scale by height, but also cap so wide/fat models don't overflow
+      const scaleByH = scaleTarget / (size.y || 1);
+      const scaleByW = (scaleTarget + 0.1) / (Math.max(size.x, size.z) || 1);
+      const scale    = Math.min(scaleByH, scaleByW);
+
+      model.scale.setScalar(scale);
+
+      // Center X/Z, anchor feet at world y = 0
+      model.position.x = -center.x * scale;
+      model.position.y = -min.y * scale;
+      model.position.z = -center.z * scale;
+
+      // Start facing the camera
+      model.rotation.y = Math.PI;
+    }
+
+    /* ── Build a minimal Three.js scene ─────────────────── */
+    function buildScene(canvas, W, H) {
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'low-power' });
+      renderer.setSize(W, H);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+      const scene  = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(36, W / H, 0.1, 100);
+      camera.position.set(0, 1.7, 6.0);
+      camera.lookAt(0, 1.7, 0);
+
+      scene.add(new THREE.AmbientLight(0xffffff, 1.4));
+      const key = new THREE.DirectionalLight(0xffffff, 1.6);
+      key.position.set(2, 5, 3);
+      scene.add(key);
+      const fill = new THREE.DirectionalLight(0xb4c8ff, 0.6);
+      fill.position.set(-3, 1, -2);
+      scene.add(fill);
+
+      return { renderer, scene, camera };
+    }
+
+    /* ── Card viewers (one per character card) ───────────── */
+    function setupCardViewer(canvas, glbPath, scaleTarget) {
+      const wrap    = canvas.parentElement;
+      const loading = wrap.querySelector('.char-loading');
+
+      const W = wrap.clientWidth  || 280;
+      const H = wrap.clientHeight || 300;
+
+      const { renderer, scene, camera } = buildScene(canvas, W, H);
+      const clock = new THREE.Clock();
+
+      loader.load(
+        glbPath,
+        (gltf) => {
+          const model = gltf.scene;
+          fitModel(model, scaleTarget);
+          scene.add(model);
+
+          const mixer = new THREE.AnimationMixer(model);
+          const clip = pickAnim(gltf.animations);
+          if (clip) mixer.clipAction(clip).play();
+
+          canvas.style.opacity = '1';
+          if (loading) loading.style.display = 'none';
+
+          let rotY = 0;
+          (function animate() {
+            requestAnimationFrame(animate);
+            const d = clock.getDelta();
+            mixer.update(d);
+            rotY += d * 0.45;
+            model.rotation.y = rotY;
+            renderer.render(scene, camera);
+          })();
+        },
+        undefined,
+        () => {
+          // GLB not found — show a clean "coming soon" placeholder
+          if (loading) {
+            loading.style.animation = 'none';
+            loading.style.opacity   = '0.35';
+            loading.style.flexDirection = 'column';
+            loading.style.gap = '8px';
+            loading.innerHTML += `<span style="font-size:11px;letter-spacing:2px;font-family:sans-serif;color:#fff;">COMING SOON</span>`;
+          }
+        }
+      );
+    }
+
+    /* ── Banner viewer (shared, loads on character select) ── */
+    const bannerState = { renderer: null, animId: null, mixer: null, model: null, scene: null, clock: new THREE.Clock() };
+
+    window.loadBannerModel = function(glbPath, onReady) {
+      const canvas = document.getElementById('bannerCanvas');
+      const W = 200, H = 320;
+
+      // Init renderer once
+      if (!bannerState.renderer) {
+        const built = buildScene(canvas, W, H);
+        bannerState.renderer = built.renderer;
+        bannerState.scene    = built.scene;
+        bannerState.camera   = built.camera;
+      }
+
+      // Clear previous model
+      if (bannerState.animId)  { cancelAnimationFrame(bannerState.animId); bannerState.animId = null; }
+      if (bannerState.mixer)   { bannerState.mixer.stopAllAction(); }
+      if (bannerState.model)   { bannerState.scene.remove(bannerState.model); }
+
+      loader.load(
+        glbPath,
+        (gltf) => {
+          const model = gltf.scene;
+          fitModel(model);
+          bannerState.scene.add(model);
+          bannerState.model = model;
+
+          bannerState.mixer = new THREE.AnimationMixer(model);
+          const bannerClip = pickAnim(gltf.animations);
+          if (bannerClip) bannerState.mixer.clipAction(bannerClip).play();
+
+          if (onReady) onReady();
+
+          let rotY = 0;
+          const { renderer, scene, camera, clock, mixer } = bannerState;
+          (function animate() {
+            bannerState.animId = requestAnimationFrame(animate);
+            const d = clock.getDelta();
+            mixer.update(d);
+            rotY += d * 0.3;
+            model.rotation.y = rotY;
+            renderer.render(scene, camera);
+          })();
+        },
+        undefined,
+        () => {
+          // GLB missing — show fallback image in banner
+          const avatar = document.getElementById('selectedAvatar');
+          canvas.style.display = 'none';
+          if (avatar) avatar.style.opacity = '1';
+        }
+      );
+    };
+
+    /* ── Init all card viewers on load ──────────────────── */
+    window.addEventListener('DOMContentLoaded', () => {
+      // Small rAF delay so CSS layout is complete before reading clientWidth/Height
+      requestAnimationFrame(() => {
+        document.querySelectorAll('.magic-card[data-glb]').forEach(card => {
+          const canvas = card.querySelector('.char-3d-canvas');
+          if (canvas) setupCardViewer(canvas, card.dataset.glb, parseFloat(card.dataset.scale) || 1.4);
+        });
+      });
+    });
+  </script>
+
+  <script src="animations.js"></script>
+</body>
+</html>

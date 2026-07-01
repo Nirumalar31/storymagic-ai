@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome Back — StoryMagic AI</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body>
+
+  <!-- Background Layers -->
+  <div class="bg-stars"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Navigation -->
+  <nav class="nav-pill">
+    <a href="index.html" class="nav-pill-logo">
+      <img src="images/Logo.png" alt="StoryMagic Logo" class="nav-logo-img">
+    </a>
+    <div class="nav-pill-links">
+      <a href="index.html">Home</a>
+      <a href="characters.html">Characters</a>
+      <a href="parent.html">Parents</a>
+    </div>
+    <div class="nav-pill-auth"></div>
+  </nav>
+
+  <main class="page-wrapper" style="display:flex; align-items:center; justify-content:center;">
+    <div class="auth-container" style="width: 100%; max-width: 450px; padding: 0 24px;">
+      
+      <div class="glass-panel" style="text-align: center; padding: 50px 40px; background: rgba(12, 8, 35, 0.88); border-color: rgba(255,255,255,0.12);">
+        <h1 class="dreamy-title" style="font-size: 2.2rem; margin-bottom: 32px;">Welcome <span>Back</span></h1>
+        
+        <form id="loginForm" style="display: flex; flex-direction: column; gap: 20px;">
+          <div style="text-align: left;">
+            <label class="form-label" style="display:block; margin-bottom:8px; font-weight:500;">Email Address</label>
+            <input type="email" class="form-input" placeholder="hello@magic.com" required style="background: rgba(255,255,255,0.05);">
+          </div>
+
+          <div style="text-align: left;">
+            <label class="form-label" style="display:block; margin-bottom:8px; font-weight:500;">Secret Password</label>
+            <input type="password" class="form-input" placeholder="••••••••" required style="background: rgba(255,255,255,0.05);">
+          </div>
+
+          <div style="text-align: right; margin-top: -10px;">
+            <a href="#" style="color: rgba(255,255,255,0.4); font-size: 13px; font-weight: 500; text-decoration: none;">Forgot Password?</a>
+          </div>
+
+          <button type="button" class="btn dreamy-btn-pink jelly-hover" style="width: 100%; margin-top: 10px;" onclick="handleLogin()">Sign In ✨</button>
+        </form>
+
+        <p style="margin-top: 30px; color: rgba(255,255,255,0.6); font-weight: 500;">
+          New explorer? <a href="signup.html" style="color: var(--candy-blue); text-decoration: none;">Create Account</a>
+        </p>
+
+        <div style="margin-top: 40px; display: flex; align-items: center; gap: 10px;">
+          <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+          <span style="font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.2);">OR LOG IN WITH</span>
+          <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+        </div>
+
+        <div style="display: flex; gap: 16px; justify-content: center; margin-top: 24px;">
+          <button class="btn dreamy-btn-purple" style="padding: 12px; border-radius: 12px;"><i class="fab fa-google"></i></button>
+          <button class="btn dreamy-btn-purple" style="padding: 12px; border-radius: 12px;"><i class="fab fa-apple"></i></button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="auth.js"></script>
+  <script>
+    function handleLogin() {
+      const inputs = document.querySelectorAll('.form-input');
+      const email = inputs[0].value;
+      if (!email) return alert("Please enter your email!");
+      
+      mockLogin(email, 'Back Again');
+    }
+  </script>
+
+</body>
+</html>

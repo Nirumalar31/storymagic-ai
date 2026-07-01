@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StoryMagic AI — Animated Storybook for Kids</title>
+  <meta name="description"
+    content="An AI-powered interactive animated storybook for children aged 4–8. Choose your adventure, hear narration, and watch stories come to life!" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+
+<body>
+
+  <!-- Background Layers -->
+  <div class="bg-stars"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+
+  <!-- Navigation Header -->
+  <nav class="nav-pill">
+    <a href="index.html" class="nav-pill-logo">
+      <img src="images/Logo.png" alt="StoryMagic Logo" class="nav-logo-img">
+    </a>
+    <div class="nav-pill-links">
+      <a href="index.html">Home</a>
+      <a href="characters.html">Characters</a>
+      <a href="parent.html">Parents</a>
+    </div>
+    <div class="nav-pill-auth">
+      <!-- Logic in auth.js will fill this -->
+    </div>
+  </nav>
+
+  <!-- Main Content Dreamy Hero -->
+  <div class="dreamy-hero">
+
+    <div class="hero-badge-new"> AI-Powered Storytelling for Kids</div>
+
+    <h1 class="dreamy-title hero-main-title">
+      Discover <span class="hero-gradient-word">Magical Stories</span>
+      Created Just for Your Child
+    </h1>
+
+    <p class="hero-subtitle-new">Every adventure is unique, safe &amp; made just for your little explorer.<br>Choose a
+      hero, pick a world, and let the magic begin!</p>
+
+    <div class="dreamy-hero-buttons">
+      <a href="#createSection" class="btn dreamy-btn-pink jelly-hover hero-cta-btn"> Start Story</a>
+      <a href="signup.html" class="btn hero-ghost-btn jelly-hover">Join Free →</a>
+    </div>
+
+    <div class="dreamy-feature-bar">
+      <span class="feature-pill fp-green">✨ Interactive Adventures</span>
+      <span class="feature-pill fp-yellow">🌟 Personalized Learning</span>
+      <span class="feature-pill fp-blue">🛡️ Safe &amp; Kid Friendly</span>
+    </div>
+
+  </div>
+
+  <!-- Story Creation Console -->
+  <div id="createSection" class="magic-console jelly-hover">
+    <div class="form-title"> The Magic Story Console</div>
+
+    <div class="form-row">
+      <!-- Name Input -->
+      <div class="form-group flex-1">
+        <label class="form-label" for="childName"> Child's Name:</label>
+        <input class="form-input" id="childName" type="text" placeholder="e.g. Leo" autocomplete="off" />
+      </div>
+      <!-- Special Ideas Input -->
+      <div class="form-group flex-1">
+        <label class="form-label" for="prompt"> Special Ideas (optional):</label>
+        <input class="form-input" id="prompt" type="text" placeholder="e.g. a brave cat..." autocomplete="off" />
+      </div>
+    </div>
+
+    <div class="form-group align-left">
+      <label class="form-label"> Child's Age (For AI Vocabulary):</label>
+      <div class="age-grid">
+        <div class="age-card selected" data-age="4-5" onclick="selectAge(this, '4-5')">Ages 4 - 5</div>
+        <div class="age-card" data-age="6-7" onclick="selectAge(this, '6-7')">Ages 6 - 7</div>
+        <div class="age-card" data-age="8" onclick="selectAge(this, '8')">Age 8+</div>
+      </div>
+    </div>
+
+    <div class="form-group align-left">
+      <label class="form-label"> Choose a Kingdom:</label>
+      <div class="theme-grid">
+        <div class="theme-card" data-theme="forest" onclick="selectTheme(this,'forest')">
+          <span class="theme-icon">🌲</span><span>Forest</span>
+        </div>
+        <div class="theme-card" data-theme="space" onclick="selectTheme(this,'space')">
+          <span class="theme-icon">🚀</span><span>Space</span>
+        </div>
+        <div class="theme-card" data-theme="ocean" onclick="selectTheme(this,'ocean')">
+          <span class="theme-icon">🌊</span><span>Ocean</span>
+        </div>
+        <div class="theme-card" data-theme="dinosaur" onclick="selectTheme(this,'dinosaur')">
+          <span class="theme-icon">🦖</span><span>Dinos</span>
+        </div>
+        <div class="theme-card" data-theme="superpower" onclick="selectTheme(this,'superpower')">
+          <span class="theme-icon">⚡</span><span>Super</span>
+        </div>
+        <div class="theme-card" data-theme="mystery" onclick="selectTheme(this,'mystery')">
+          <span class="theme-icon">🎲</span><span>Mystery</span>
+        </div>
+        <div class="theme-card" data-theme="kindness" onclick="selectTheme(this,'kindness')">
+          <span class="theme-icon">💎</span><span>Treasure</span>
+        </div>
+        <div class="theme-card" data-theme="moral" onclick="selectTheme(this,'moral')">
+          <span class="theme-icon">⭐</span><span>Moral</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn dreamy-btn-pink jelly-hover console-generate-btn" id="beginBtn" onclick="generateStory()">
+      Generate Adventure!
+    </button>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay hidden" id="loadingOverlay">
+    <div class="loader-ring"></div>
+    <div class="loading-text">Brewing your story<span class="loading-dots"></span></div>
+    <p style="color:rgba(255,255,255,0.6); font-size:15px;">The magic is working ✨</p>
+  </div>
+
+  <!-- Floating Particles -->
+  <div id="particleContainer"></div>
+
+  <!-- Global Footer -->
+  <footer class="pro-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="images/Logo.png" alt="StoryMagic Logo" class="footer-logo-img">
+        <p>Making learning to read a magical, unforgettable <br> experience through personalized AI stories.</p>
+        <div class="footer-socials">
+          <a href="https://www.instagram.com/storymagic_ai?igsh=amZ4OW9lZWNyd21r&amp;utm_source=qr" target="_blank"
+            class="footer-social-btn social-instagram" title="Instagram">
+            <img src="images/instagram.webp" alt="Instagram" class="social-icon-img" />
+          </a>
+          <a href="https://www.tiktok.com/@storymagic_ai?_r=1&amp;_t=ZS-95WrXclgNGr" target="_blank"
+            class="footer-social-btn social-tiktok" title="TikTok">
+            <img src="images/tik tok.webp" alt="TikTok" class="social-icon-img" />
+          </a>
+          <a href="#" class="footer-social-btn social-youtube" title="YouTube">
+            <img src="images/youtube.png" alt="YouTube" class="social-icon-img" />
+          </a>
+          <a href="#" class="footer-social-btn social-linkedin" title="LinkedIn">
+            <img src="images/linkedin.png" alt="LinkedIn" class="social-icon-img" />
+          </a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="library.html">Library</a></li>
+            <li><a href="characters.html">Characters</a></li>
+            <li><a href="parent.html">Parents Dashboard</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 StoryMagic AI. All rights reserved. Created with ❤️ for young explorers.</p>
+    </div>
+  </footer>
+
+  <script src="auth.js"></script>
+  <script>
+    /* ── State ───────────────────────────────────────────── */
+    let selectedTheme = '';
+    let selectedCharacter = '🧚';
+    let selectedAge = '4-5';
+
+    /* ── Theme Selection ─────────────────────────────────── */
+    function selectTheme(el, theme) {
+      document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedTheme = theme;
+      spawnSparks(el, 5);
+    }
+
+    /* ── Age Selection ─────────────────────────────────────── */
+    function selectAge(el, age) {
+      document.querySelectorAll('.age-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedAge = age;
+      spawnSparks(el, 4);
+    }
+
+    /* ── Mascot Pick ─────────────────────────────────────── */
+    function pickMascotChar(char) {
+      selectedCharacter = char;
+      spawnSparks(event.currentTarget, 6);
+    }
+
+    /* ── Generate Story ──────────────────────────────────── */
+    async function generateStory() {
+      const nameInput = document.getElementById('childName').value.trim();
+      const promptInput = document.getElementById('prompt').value.trim();
+
+      if (!nameInput) {
+        alert("Please tell us your name!");
+        return;
+      }
+      if (!selectedTheme) {
+        alert("Please pick a story theme!");
+        return;
+      }
+
+      document.getElementById('loadingOverlay').classList.remove('hidden');
+
+      const payload = {
+        name: nameInput,
+        prompt: promptInput || "a fun adventure",
+        theme: selectedTheme,
+        character: selectedCharacter,
+        age: selectedAge
+      };
+
+      try {
+        const res = await fetch('http://127.0.0.1:5000/generate-story', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        localStorage.setItem('storyData', JSON.stringify({
+          story: data.story,
+          title: data.title || `${nameInput}'s ${titleify(selectedTheme)} Adventure`,
+          theme: selectedTheme,
+          character: selectedCharacter,
+          name: nameInput
+        }));
+
+        window.location.href = 'http://127.0.0.1:5000/story';
+      } catch (err) {
+        console.error(err);
+        /* Fallback demo story if server is not running */
+        const fallback = buildFallbackStory(name, selectedTheme, selectedCharacter);
+        localStorage.setItem('storyData', JSON.stringify(fallback));
+        showLoading(false);
+        window.location.href = 'story.html';
+      }
+    }
+
+    /* ── Fallback / Demo Story ───────────────────────────── */
+    function buildFallbackStory(name, theme, char) {
+      const themes = {
+        forest: {
+          title: `${name} & The Magical Forest Explorer`,
+          pages: [
+            `One sunny morning, ${name} discovered a glowing compass hidden in the backyard. When touched, the world dissolved into a flurry of golden leaves! ${name} was standing at the edge of the Magical Forest. ${char} popped out of a hollow log, ready for an adventure.`,
+            `The compass pointed toward a sparkling river where a sad little mushroom sat on a rock. "The water keeps sweeping away my bridge parts!" cried the mushroom. "I need to get to the giant treehouse."`,
+            `${name} looked around and gathered flat stones and sturdy sticks. With careful planning and ${char}'s encouragement, they rebuilt the bridge piece by piece. The mushroom cheered and offered them a glowing acorn!`,
+            `Inside the giant treehouse, a wise old owl awaited them. "You showed great empathy," the owl said, "helping someone when they needed it most. You are a true Forest Explorer."`,
+            `With a final glow of the compass, ${name} was transported back home. The glowing acorn was safely tucked in their pocket as a reminder of their magical journey and their kindness.`
+          ],
+          moral: "Helping others in need is a wonderful way to make friends and solve problems!",
+          quiz: { q: "What did you rebuild for the mushroom?", a: "A bridge!" }
+        },
+        space: {
+          title: `Space Buddies on Planet Sprinklepop`,
+          pages: [
+            `${name} was fixing a toy when a friendly rocket ship landed in the yard! ${char} waved from the window. "Hop in! Planet Sprinklepop needs our help!" the rocket beeped.`,
+            `They zoomed past stars and landed on a planet made entirely of candy colors. But a friendly robot named Beep was crying gears. "My jumping springs popped out!" Beep whirred sadly.`,
+            `"Don't worry," said ${name}, pulling out a toolkit. They matched the red springs to the red slots and the blue springs to the blue slots. It was a fun puzzle of colors and sequences!`,
+            `Boing! Beep sprang high into the air, doing joyful flips. The aliens of Sprinklepop cheered, tossing stardust confetti everywhere. "Thank you for fixing our robot friend!" they sang.`,
+            `Tired but happy, ${name} and ${char} flew back to Earth. They realized that working together and looking closely at how things fit makes any puzzle solvable!`
+          ],
+          moral: "Teamwork and looking closely at sequences helps us fix tricky problems!",
+          quiz: { q: "What was the name of the friendly robot?", a: "Beep!" }
+        },
+        ocean: {
+          title: `The Underwater Kingdom Quest`,
+          pages: [
+            `While playing near the water, ${name} found a magical seashell. Whispering the secret word, ${name} and ${char} were suddenly diving deep into a breathtaking, glowing Underwater Kingdom!`,
+            `A young mermaid swam over quickly. "The Ocean's Heartlight has gone dark!" she explained. "We need brave explorers to search the glowing trenches and bring back the magical pearls!"`,
+            `It was dark in the trench, and ${name} felt a bit scared. But taking a deep breath, they swam down bravely, befriending a giant, glowing sea turtle who guided their way.`,
+            `Deep in the coral cave, they found the missing pearls. Taking them back to the center of the kingdom, the Heartlight glowed brilliantly, lighting up the entire ocean in a magnificent rainbow.`,
+            `The sea creatures celebrated their courage. The mermaid awarded ${name} with an Honorary Explorer Badge. ${name} realized that true courage is doing the right thing, even when you're a little scared.`
+          ],
+          moral: "Courage isn't not being scared; it's doing the brave thing even when you are scared!",
+          quiz: { q: "Which animal guided them through the trench?", a: "A sea turtle!" }
+        },
+        superpower: {
+          title: `Your Superpower Day`,
+          pages: [
+            `Imagine waking up and discovering you have a superpower! ${char} floated into ${name}'s room with a glowing cape. "Today is Superpower Day! Put this on!"`,
+            `${name} chose the power of Super Speed. Suddenly, they could clean their room, do their homework, and run to the park in less than a single second!`,
+            `At the park, a puppy had gotten stuck in a muddy patch. It was far away, but with Super Speed, ${name} zoomed over like a lightning bolt and gently lifted the puppy to safety.`,
+            `Everybody cheered! But ${name} realized that zooming too fast made them accidentally bump into a sandwich stand. They had to use their super speed to quickly clean up the sandwich mess, too.`,
+            `${name} learned that having superpowers is incredibly fun, but they also require responsibility. You have to be careful with your actions so you don't make bigger messes!`
+          ],
+          moral: "Having power is fun, but it comes with the responsibility of being careful!",
+          quiz: { q: "What superpower did you choose?", a: "Super Speed!" }
+        },
+        kindness: {
+          title: `The Kindness Treasure Hunt`,
+          pages: [
+            `The mayor of the town called upon ${name} and ${char} for a very special mission. "We are hosting the Kindness Treasure Hunt! You must find all three Kindness Gems hidden in the town."`,
+            `The first task was at the library. A child couldn't reach a book on the top shelf. ${name} helped them reach it, and ping! A blue Kindness Gem appeared in their hand.`,
+            `Next, at the playground, two friends were arguing over a swing. ${name} suggested they take turns counting to twenty. They agreed, laughed, and ping! A pink Kindness Gem appeared.`,
+            `Finally, ${name} shared half of their delicious sandwich with a hungry stray cat. Ping! The final golden Kindness Gem materialized, glowing warmly.`,
+            `${name} presented the gems to the mayor. "You see," the mayor smiled, "the treasure wasn't hidden in the ground. It was hidden in your heart the entire time!"`
+          ],
+          moral: "Kindness is the greatest treasure, and sharing makes everyone happy!",
+          quiz: { q: "How did you get the pink gem?", a: "By helping friends share the swing!" }
+        },
+        moral: {
+          title: `Luna Learns to Try Again`,
+          pages: [
+            `${name} and ${char} were visiting the Grand Sparkle Talent Show when they met Luna. Luna really wanted to perform her magic dance, but she was crying. "I keep falling down!" she sobbed.`,
+            `"It's okay to fall down," ${name} said kindly. "The important thing is that we try again." ${name} offered to practice the dance with Luna, counting the steps out loud together.`,
+            `They practiced by the stream, they practiced under the big tree, and they practiced even when it got hard. Every time Luna fell, ${name} cheered her on. "You've got this!"`,
+            `When the talent show began, Luna stepped onto the stage. She stumbled once, but remembered ${name}'s words. She got right back up and finished her dance with a spectacular magical spin!`,
+            `The crowd roared with applause. Luna gave ${name} a huge hug. "Thank you for believing in me!" They learned that practice and resilience make the magic stronger.`
+          ],
+          moral: "Making mistakes is how we learn! True magic happens when we try again.",
+          quiz: { q: "What was Luna trying to do in the talent show?", a: "A magic dance!" }
+        },
+        dinosaur: {
+          title: `${name} & The Friendly T-Rex`,
+          pages: [
+            `"ROAARR!" ${name} jumped. The backyard had turned into a giant, leafy prehistoric jungle! And there, eating cookies from a picnic basket, was a tiny green T-Rex.`,
+            `"I'm Rex!" the dinosaur mumbled, cookie crumbs falling from his mouth. "I lost my favorite bouncy ball in the Volcano of Bubbles. Can you help me find it?" ${name} and ${char} nodded bravely.`,
+            `They hiked past sleeping triceratops and giant flying pterodactyls. Finally, they reached the volcano. But instead of hot lava, it was bubbling with soapy, rainbow-colored bubbles!`,
+            `Using a giant palm leaf as a fan, ${name} blew the bubbles away until they spotted the shiny red bouncy ball. Rex was so happy he did a little dinosaur dance, wiggling his tiny arms.`,
+            `"You're the best friend a dinosaur could have," Rex said, sharing his last cookie. ${name} realized that even the biggest, scariest-looking creatures just want a friend to play with.`
+          ],
+          moral: "Everyone needs a friend to play with, no matter how big or small they are!",
+          quiz: { q: "What did the volcano blow out instead of lava?", a: "Rainbow Bubbles!" }
+        },
+        mystery: {
+          title: `The Great Mystery Box`,
+          pages: [
+            `${name} found a strange, glowing box that said "DO NOT OPEN UNLESS YOU LIKE SILLY THINGS." Of course, ${name} and ${char} opened it immediately! Whoosh! They were sucked inside!`,
+            `They landed on a cloud made entirely of pink cotton candy. A dog wearing a top hat trotted over. "Welcome to Sillyville! It's raining jellybeans today!" he barked happily.`,
+            `Suddenly, a giant flying pancake swooped down and stole the dog's top hat! "Oh no, my formal wear!" the dog cried. ${name} knew they had to help.`,
+            `Using a springboard made of marshmallows, ${name} bounced high into the air and grabbed the hat back from the pancake. The pancake apologized, saying it just wanted to look fancy.`,
+            `The dog gave ${name} a shiny, golden jellybean as a reward. "You saved the day with your bouncy bravery!" ${name} laughed, realizing that the best adventures are the silly ones.`
+          ],
+          moral: "A fun sense of humor and bravery can turn any silly situation into a great adventure!",
+          quiz: { q: "What stole the dog's top hat?", a: "A giant flying pancake!" }
+        }
+      };
+
+      const data = themes[theme] || themes['forest'];
+      return {
+        story: data.pages,
+        title: data.title,
+        theme: theme,
+        character: char,
+        name: name,
+        moral: data.moral,
+        quiz: data.quiz
+      };
+    }
+
+    /* ── Helpers ─────────────────────────────────────────── */
+    function titleify(s) {
+      return s ? s.charAt(0).toUpperCase() + s.slice(1) : 'Magical';
+    }
+
+    function showLoading(show) {
+      document.getElementById('loadingOverlay').classList.toggle('hidden', !show);
+    }
+
+    function shakEl(el) {
+      el.style.animation = 'wiggle 0.4s ease';
+      setTimeout(() => el.style.animation = '', 400);
+    }
+
+    /* ── Spark Effect ────────────────────────────────────── */
+    function spawnSparks(el, count = 5) {
+      const rect = el.getBoundingClientRect();
+      const emojis = ['✨', '⭐', '💫', '🌟', '🎉'];
+      for (let i = 0; i < count; i++) {
+        const spark = document.createElement('div');
+        spark.className = 'spark';
+        spark.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        spark.style.left = (rect.left + Math.random() * rect.width) + 'px';
+        spark.style.top = (rect.top + Math.random() * rect.height) + 'px';
+        spark.style.animationDelay = (Math.random() * 0.3) + 's';
+        document.body.appendChild(spark);
+        setTimeout(() => spark.remove(), 1000);
+      }
+    }
+
+    /* ── Floating Particles ──────────────────────────────── */
+    (function spawnParticles() {
+      const items = ['⭐', '🌟', '✨', '💫', '🔮', '🌈', '🎈', '🦋'];
+      const container = document.getElementById('particleContainer');
+      setInterval(() => {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.textContent = items[Math.floor(Math.random() * items.length)];
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.fontSize = (14 + Math.random() * 16) + 'px';
+        const dur = 8 + Math.random() * 10;
+        p.style.animationDuration = dur + 's';
+        p.style.animationDelay = Math.random() * 2 + 's';
+        container.appendChild(p);
+        setTimeout(() => p.remove(), (dur + 2) * 1000);
+      }, 1200);
+    })();
+
+    /* ── Global Magic Clicks ─────────────────────────────── */
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('button') || e.target.closest('.theme-card') || e.target.closest('.mascot')) return;
+      const spark = document.createElement('div');
+      spark.className = 'spark';
+      const emojis = ['✨', '⭐', '💫', '🌟', '🎉'];
+      spark.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      spark.style.left = e.clientX + 'px';
+      spark.style.top = e.clientY + 'px';
+      document.body.appendChild(spark);
+      setTimeout(() => spark.remove(), 800);
+    });
+  </script>
+
+
+</body>
+
+</html>

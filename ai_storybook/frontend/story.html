@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Story Time! — StoryMagic AI</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body>
+
+  <!-- Background Layers -->
+  <div class="bg-stars"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Navigation Header -->
+  <nav class="nav-pill">
+    <a href="index.html" class="nav-pill-logo">
+      <img src="images/Logo.png" alt="StoryMagic Logo" class="nav-logo-img">
+    </a>
+    <div class="nav-pill-links">
+      <a href="index.html">Home</a>
+      <a href="characters.html">Characters</a>
+      <a href="parent.html">Parents</a>
+    </div>
+    <div class="nav-pill-auth">
+      <!-- Logic in auth.js will fill this -->
+    </div>
+  </nav>
+
+  <main class="page-wrapper" style="padding-top: 40px;">
+    
+    <!-- Story Progress Header -->
+    <div class="storybook-container" style="padding-bottom: 0;">
+      <div class="glass-panel" style="padding: 24px; margin-bottom: 32px; display: flex; align-items: center; justify-content: space-between; min-width: 100%;">
+        <div class="story-id">
+          <h2 id="storyTitleHeader" class="dreamy-title" style="font-size: 1.8rem; margin-bottom: 0;">My Adventure</h2>
+          <span id="pageCounter" style="color: var(--candy-yellow); font-weight: 500; font-family: var(--font-ui);">Page 1 of 5</span>
+        </div>
+        <div class="progress-container" style="width: 200px;">
+          <div class="progress-bar-wrap">
+            <div id="progressFill" class="progress-bar-fill" style="width: 20%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="storybook-container">
+      <div class="storybook-book" id="storybookBook">
+        
+        <!-- Left Page: Visual Scene -->
+        <div class="left-page">
+          <div class="scene-view">
+            <div id="sceneBg" style="position:absolute; inset:0; transition: background 1.2s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+            <div id="sceneCharacter" onclick="pokeCharacter()" style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%); font-size: 160px; cursor:pointer; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4)); transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);">🧚</div>
+            <div id="sceneOverlay" style="position:absolute; inset:0; pointer-events:none;"></div>
+          </div>
+        </div>
+
+        <!-- Right Page: Story Text & Choices -->
+        <div class="right-page">
+          <div class="story-text-container">
+            <p id="storyText"></p>
+          </div>
+
+          <!-- Interactive Choices Panel (Fetched from API) -->
+          <div id="choicesPanel" class="choice-panel" style="display:none;">
+            <h3 style="color: var(--candy-purple); font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 20px;">🌟 What should happen next?</h3>
+            <div id="choiceList" style="display: grid; gap: 12px;"></div>
+          </div>
+
+          <!-- Story Controls -->
+          <div class="story-nav-controls" style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 40px; flex-wrap: wrap; gap: 15px;">
+            <button id="prevBtn" class="btn dreamy-btn-purple jelly-hover" onclick="changePage(-1)" style="padding: 12px 30px;">◀ Back</button>
+            
+            <div class="narration-hub" style="display: flex; align-items: center; gap: 8px;">
+              <button id="narrateBtn" class="btn dreamy-btn-pink jelly-hover" onclick="toggleNarration()" style="padding: 12px 24px; font-size: 16px;">
+                <span id="narrateBtnTxt">🔊 Listen</span>
+                <div id="soundWave" class="sound-wave-container" style="display:none;">
+                  <span class="sound-wave-bar" style="animation-delay: 0.1s;"></span>
+                  <span class="sound-wave-bar" style="animation-delay: 0.2s;"></span>
+                  <span class="sound-wave-bar" style="animation-delay: 0.1s;"></span>
+                </div>
+              </button>
+            </div>
+
+            <button id="nextBtn" class="btn dreamy-btn-pink jelly-hover" onclick="changePage(1)" style="padding: 12px 30px;">Next ▶</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Ending Magic Section -->
+      <div id="endSection" class="glass-panel" style="display:none; text-align: center; margin-top: 40px; animation: bounceIn 0.8s ease both; min-width: 100%;">
+         <div style="font-size: 64px; margin-bottom: 20px;">🎉</div>
+         <h2 class="dreamy-title">What an <span>Amazing Story!</span></h2>
+         <div id="quizSection" class="quiz-container">
+            <h3 class="quiz-question" id="quizQuestion" style="color: white;">Loading Question...</h3>
+            <div class="quiz-options" id="quizOptions"></div>
+         </div>
+
+         <div id="conclusionSection" style="display:none;">
+            <div id="moralQuizContainer" class="glass-panel" style="background: rgba(255,255,255,0.05); text-align: left; margin: 30px 0;">
+                <h3 style="color: var(--candy-yellow); margin-bottom: 10px;">💡 Secret Lesson:</h3>
+                <p id="moralText" style="font-weight: 400; font-size: 1.2rem;"></p>
+            </div>
+            <div style="display:flex; gap: 20px; justify-content: center;">
+                <a href="index.html" class="btn dreamy-btn-pink jelly-hover">New Story</a>
+                <button class="btn dreamy-btn-purple jelly-hover" onclick="restartStory()">Read Again</button>
+            </div>
+         </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="particleContainer"></div>
+
+  <!-- Global Footer -->
+  <footer class="pro-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="images/Logo.png" alt="StoryMagic Logo" class="footer-logo-img">
+        <p>Making learning to read a magical, unforgettable <br> experience through personalized AI stories.</p>
+        <div class="footer-socials">
+          <a href="https://www.instagram.com/storymagic_ai?igsh=amZ4OW9lZWNyd21r&amp;utm_source=qr" target="_blank" class="footer-social-btn social-instagram" title="Instagram">
+            <img src="images/instagram.webp" alt="Instagram" class="social-icon-img"/>
+          </a>
+          <a href="https://www.tiktok.com/@storymagic_ai?_r=1&amp;_t=ZS-95WrXclgNGr" target="_blank" class="footer-social-btn social-tiktok" title="TikTok">
+            <img src="images/tik tok.webp" alt="TikTok" class="social-icon-img"/>
+          </a>
+          <a href="#" class="footer-social-btn social-youtube" title="YouTube">
+            <img src="images/youtube.png" alt="YouTube" class="social-icon-img"/>
+          </a>
+          <a href="#" class="footer-social-btn social-linkedin" title="LinkedIn">
+            <img src="images/linkedin.png" alt="LinkedIn" class="social-icon-img"/>
+          </a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="library.html">Library</a></li>
+            <li><a href="characters.html">Characters</a></li>
+            <li><a href="parent.html">Parents Dashboard</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 StoryMagic AI. All rights reserved. Created with ❤️ for young explorers.</p>
+    </div>
+  </footer>
+
+  <script src="auth.js"></script>
+  <script>
+    let storyData = JSON.parse(localStorage.getItem('storyData') || 'null');
+    let currentPage = 0;
+    let speaking = false;
+    let branchingChoiceMade = false;
+
+    const themeColors = {
+      forest: 'linear-gradient(135deg, #2D6A4F, #1B4332)',
+      space: 'linear-gradient(135deg, #16113A, #0A051A)',
+      ocean: 'linear-gradient(135deg, #0077B6, #023E8A)',
+      dinosaur: 'linear-gradient(135deg, #4A4E69, #22223B)',
+      kindness: 'linear-gradient(135deg, #F8A5C2, #F78FB3)',
+      land: 'linear-gradient(135deg, #4361EE, #3F37C9)'
+    };
+
+    function init() {
+      if (!storyData) {
+        window.location.href = 'index.html';
+        return;
+      }
+      document.getElementById('storyTitleHeader').textContent = storyData.title;
+      document.getElementById('sceneCharacter').textContent = storyData.character;
+      document.getElementById('sceneBg').style.background = themeColors[storyData.theme] || themeColors.land;
+      showPage();
+    }
+
+    async function showPage(isNavigating = false) {
+      const total = storyData.story.length;
+      document.getElementById('pageCounter').textContent = `Page ${currentPage + 1} of ${total}`;
+      document.getElementById('progressFill').style.width = ((currentPage + 1) / total * 100) + '%';
+      document.getElementById('prevBtn').disabled = currentPage === 0;
+      document.getElementById('nextBtn').textContent = currentPage === total - 1 ? 'Finish!' : 'Next ▶';
+      
+      revealText(storyData.story[currentPage]);
+      
+      // Handle Branching Logic (Interactive Choices)
+      if (currentPage === 2 && !branchingChoiceMade) {
+        document.getElementById('nextBtn').style.display = 'none';
+        fetchAndShowChoices();
+      } else {
+        document.getElementById('nextBtn').style.display = 'block';
+        document.getElementById('choicesPanel').style.display = 'none';
+      }
+
+      if (currentPage === total - 1) {
+        document.getElementById('endSection').style.display = 'block';
+        if (isNavigating) fireConfetti();
+        setupQuiz();
+      } else {
+        document.getElementById('endSection').style.display = 'none';
+      }
+    }
+
+    async function fetchAndShowChoices() {
+      try {
+        const res = await fetch('/story-choices', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ page: currentPage, theme: storyData.theme })
+        });
+        const data = await res.json();
+        
+        if (data.choices && data.choices.length > 0) {
+          const container = document.getElementById('choiceList');
+          container.innerHTML = '';
+          data.choices.forEach(c => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-orb jelly-hover';
+            btn.innerHTML = `<span class="orb-icon">${c.emoji}</span> ${c.text}`;
+            btn.onclick = () => selectChoice(c);
+            container.appendChild(btn);
+          });
+          document.getElementById('choicesPanel').style.display = 'block';
+        } else {
+          document.getElementById('nextBtn').style.display = 'block';
+        }
+      } catch (e) {
+        console.error("Failed to fetch choices", e);
+        document.getElementById('nextBtn').style.display = 'block';
+      }
+    }
+
+    function selectChoice(choice) {
+      branchingChoiceMade = true;
+      document.getElementById('choicesPanel').style.display = 'none';
+      document.getElementById('nextBtn').style.display = 'block';
+      spawnSparks(document.getElementById('choicesPanel'), 20);
+      
+      if (storyData.story[currentPage + 1]) {
+        storyData.story[currentPage + 1] = `Because you chose to ${choice.text}, ${storyData.story[currentPage + 1]}`;
+      }
+      
+      changePage(1);
+    }
+
+    function revealText(text) {
+      const el = document.getElementById('storyText');
+      el.innerHTML = '';
+      text.split(' ').forEach((word, i) => {
+        const span = document.createElement('span');
+        span.textContent = word + ' ';
+        span.style.opacity = '0';
+        span.style.transform = 'translateY(10px)';
+        span.style.transition = 'all 0.3s ease';
+        el.appendChild(span);
+        setTimeout(() => {
+          span.style.opacity = '1';
+          span.style.transform = 'translateY(0)';
+        }, i * 100);
+      });
+    }
+
+    function changePage(dir) {
+      const next = currentPage + dir;
+      if (next >= 0 && next < storyData.story.length) {
+        const book = document.getElementById('storybookBook');
+        book.style.transform = 'rotateY(-5deg) scale(0.98)';
+        
+        setTimeout(() => {
+          currentPage = next;
+          showPage(true);
+          book.style.transform = 'rotateY(0) scale(1)';
+        }, 400);
+        
+        if (speaking) stopNarration();
+      }
+    }
+
+    function toggleNarration() {
+      if (speaking) stopNarration();
+      else startNarration();
+    }
+
+    function startNarration() {
+      const msg = new SpeechSynthesisUtterance(storyData.story[currentPage]);
+      msg.onend = stopNarration;
+      window.speechSynthesis.speak(msg);
+      speaking = true;
+      document.getElementById('narrateBtnTxt').textContent = '⏸ Stop';
+      document.getElementById('soundWave').style.display = 'flex';
+    }
+
+    function stopNarration() {
+      window.speechSynthesis.cancel();
+      speaking = false;
+      document.getElementById('narrateBtnTxt').textContent = '🔊 Listen';
+      document.getElementById('soundWave').style.display = 'none';
+    }
+
+    function pokeCharacter() {
+      const char = document.getElementById('sceneCharacter');
+      char.style.transform = 'translateX(-50%) scale(1.3) rotate(10deg)';
+      setTimeout(() => char.style.transform = 'translateX(-50%) scale(1) rotate(0deg)', 400);
+      spawnSparks(char, 12);
+    }
+
+    function spawnSparks(el, count = 10) {
+      const rect = el.getBoundingClientRect();
+      const container = document.getElementById('particleContainer');
+      const emojis = ['✨', '⭐', '💫', '🌟', '🎉'];
+      for (let i = 0; i < count; i++) {
+        const s = document.createElement('div');
+        s.className = 'spark';
+        s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        s.style.left = (rect.left + rect.width/2 + (Math.random()-0.5)*150) + 'px';
+        s.style.top = (rect.top + rect.height/2 + (Math.random()-0.5)*150) + 'px';
+        container.appendChild(s);
+        setTimeout(() => s.remove(), 1000);
+      }
+    }
+
+    function setupQuiz() {
+      const quiz = storyData.quiz;
+      if (!quiz) { showConclusion(); return; }
+      document.getElementById('quizSection').style.display = 'block';
+      document.getElementById('quizQuestion').textContent = quiz.q;
+      
+      const optContainer = document.getElementById('quizOptions');
+      optContainer.innerHTML = '';
+      [quiz.a, 'Something funny', 'A dragon', 'A magic wand'].sort().forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-btn jelly-hover';
+        btn.textContent = opt;
+        btn.onclick = () => {
+          if (opt === quiz.a) {
+             btn.classList.add('correct');
+             fireConfetti();
+             setTimeout(showConclusion, 1500);
+          } else {
+             btn.classList.add('wrong');
+             setTimeout(() => btn.classList.remove('wrong'), 500);
+          }
+        };
+        optContainer.appendChild(btn);
+      });
+    }
+
+    function showConclusion() {
+      document.getElementById('quizSection').style.display = 'none';
+      document.getElementById('conclusionSection').style.display = 'block';
+      document.getElementById('moralText').textContent = storyData.moral || "What a lovely lesson!";
+    }
+
+    function fireConfetti() {
+      for (let i = 0; i < 60; i++) {
+        const c = document.createElement('div');
+        c.className = 'particle';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.top = '100vh';
+        c.style.background = ['#FF4081','#00E5FF','#FFD600','#64FFDA'][Math.floor(Math.random()*4)];
+        c.style.width = '10px';
+        c.style.height = '10px';
+        c.style.borderRadius = '2px';
+        c.style.animation = `floatParticle ${Math.random()*2 + 2}s linear forwards`;
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 4000);
+      }
+    }
+
+    function restartStory() {
+      currentPage = 0;
+      branchingChoiceMade = false;
+      showPage();
+    }
+
+    /* ── Global Magic ── */
+    (function spawnParticles() {
+      const items = ['⭐', '🌟', '✨', '💫', '🔮', '🌈', '🎈', '🦋'];
+      const container = document.getElementById('particleContainer');
+      setInterval(() => {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.textContent = items[Math.floor(Math.random() * items.length)];
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.fontSize = (14 + Math.random() * 16) + 'px';
+        const dur = 8 + Math.random() * 10;
+        p.style.animationDuration = dur + 's';
+        p.style.animationDelay = Math.random() * 2 + 's';
+        container.appendChild(p);
+        setTimeout(() => p.remove(), (dur + 2) * 1000);
+      }, 1200);
+    })();
+
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('button') || e.target.closest('.choice-orb')) return;
+      const spark = document.createElement('div');
+      spark.className = 'spark';
+      const emojis = ['✨', '⭐', '💫', '🌟', '🎉'];
+      spark.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      spark.style.left = e.clientX + 'px';
+      spark.style.top = e.clientY + 'px';
+      document.body.appendChild(spark);
+      setTimeout(() => spark.remove(), 1000);
+    });
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
