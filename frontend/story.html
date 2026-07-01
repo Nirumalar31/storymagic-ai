@@ -538,7 +538,7 @@
 
             <div id="sceneOverlay" style="position:absolute; inset:0; pointer-events:none; z-index:6;"></div>
           </div>
-          <div class="scene-caption" id="sceneCaption">✨ The Adventure Begins</div>
+          <div class="scene-caption" id="sceneCaption">The Adventure Begins</div>
         </div>
 
         <!-- Right Page: Story Text & Choices -->
@@ -783,8 +783,8 @@
       document.getElementById('prevBtn').disabled = currentPage === 0;
       document.getElementById('nextBtn').textContent = currentPage === total - 1 ? 'Finish!' : 'Next ▶';
       
-      const sceneCaptions = ['✨ The Adventure Begins','🌟 The Journey Continues','⚡ A Twist in the Tale','💫 The Brave Choice','🎉 The Grand Finale'];
-      document.getElementById('sceneCaption').textContent = sceneCaptions[currentPage] || '✨ The Magic Continues';
+      const sceneCaptions = ['The Adventure Begins','The Journey Continues','A Twist in the Tale','The Brave Choice','The Grand Finale'];
+      document.getElementById('sceneCaption').textContent = sceneCaptions[currentPage] || 'The Magic Continues';
       updatePageScene(currentPage);
       revealText(storyData.story[currentPage]);
 
