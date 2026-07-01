@@ -504,7 +504,7 @@
       const payload = { name: nameInput, prompt: "a fun adventure", theme: selectedTheme, character: selectedCharacter, age: mappedAge };
 
       try {
-        const res = await fetch('http://127.0.0.1:5000/generate-story', {
+        const res = await fetch('https://storymagic-ai.onrender.com/generate-story', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -517,7 +517,7 @@
           name: nameInput, age: mappedAge,
           moral: data.moral || '', wrongMorals: data.wrongMorals || [], quiz: data.quiz || null
         }));
-        window.location.href = 'http://127.0.0.1:5000/story';
+        window.location.href = 'https://storymagic-ai.onrender.com/story';
       } catch (err) {
         const fallback = buildFallbackStory(nameInput, selectedTheme, selectedCharacter);
         localStorage.setItem('storyData', JSON.stringify(fallback));
