@@ -2658,6 +2658,9 @@ input[type="file"]#avatarUpload {
   /* Navbar */
   .nav-links { display: none; }
   .navbar    { justify-content: space-between; }
+  .navbar-brand { font-size: 0.9rem; }
+  .nav-auth-btns .btn { padding: 6px 12px; font-size: 0.78rem; }
+  .nav-auth-btns { gap: 6px; }
 
   /* Hero */
   .hero-content h1 { font-size: 1.6rem; }
