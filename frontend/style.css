@@ -2605,3 +2605,91 @@ ul {
 input[type="file"]#avatarUpload {
   display: none;
 }
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE — TABLET & MOBILE
+══════════════════════════════════════════════════ */
+
+/* ── Tablet (768px) ───────────────────────────── */
+@media (max-width: 768px) {
+  /* Navbar */
+  .navbar { padding: 0 16px; }
+  .nav-links { gap: 12px; font-size: 0.85rem; }
+  .nav-links a { font-size: 0.82rem; }
+
+  /* Hero / Home */
+  .hero-content h1 { font-size: 2rem; }
+  .hero-content p  { font-size: 0.95rem; }
+  .btn-hero        { padding: 14px 28px; font-size: 1rem; }
+
+  /* Login two-column → single column */
+  .login-split { flex-direction: column; }
+  .login-video-side { display: none; }
+  .login-card-side  { width: 100%; padding: 24px; }
+
+  /* Create wizard */
+  .wizard-step-cards { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .hero-cards        { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .theme-grid        { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* Story page */
+  .storybook-container { padding: 0; margin-top: 60px; }
+  .storybook-book      { flex-direction: column !important; border-radius: 12px; }
+  .left-page  { height: 260px !important; min-height: unset !important; }
+  .right-page { padding: 20px 24px 16px 24px !important; }
+  .story-text-container p { font-size: 1rem !important; line-height: 1.7 !important; }
+  .voice-avatar-row { gap: 8px; }
+  .voice-card       { min-width: 56px; }
+  .story-nav-controls .btn { padding: 10px 16px; font-size: 0.88rem; }
+
+  /* Library */
+  .lib-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Characters */
+  .characters-grid { grid-template-columns: 1fr 1fr !important; }
+
+  /* Parent dashboard */
+  .stats-row { flex-direction: column; gap: 12px; }
+  .stat-card { width: 100%; }
+}
+
+/* ── Mobile (480px) ───────────────────────────── */
+@media (max-width: 480px) {
+  /* Navbar */
+  .nav-links { display: none; }
+  .navbar    { justify-content: space-between; }
+
+  /* Hero */
+  .hero-content h1 { font-size: 1.6rem; }
+
+  /* Create wizard */
+  .wizard-step-cards { grid-template-columns: 1fr; }
+  .hero-cards        { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .theme-grid        { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .theme-btn         { padding: 20px 10px; font-size: 0.9rem; }
+
+  /* Story page */
+  .left-page  { height: 220px !important; }
+  .right-page { padding: 16px 16px 12px 16px !important; }
+  .story-text-container p { font-size: 0.95rem !important; }
+  .voice-avatar-circle { width: 40px; height: 40px; }
+  .voice-card-name     { font-size: 0.65rem; }
+  .story-nav-controls  { gap: 6px; }
+  .story-nav-controls .btn { padding: 10px 12px; font-size: 0.82rem; }
+  #chapterLabel        { font-size: 0.65rem; }
+  #chapterStoryTitle   { font-size: 0.9rem; }
+
+  /* 3D companion — hide on very small screens to save space */
+  #companionCanvas { display: none; }
+
+  /* Library */
+  .lib-grid        { grid-template-columns: 1fr; }
+  .badge-shelf     { gap: 8px; }
+
+  /* Characters */
+  .characters-grid { grid-template-columns: 1fr 1fr !important; }
+
+  /* Quiz choices */
+  .quiz-options    { grid-template-columns: 1fr; gap: 10px; }
+  .choice-orb      { padding: 14px; font-size: 0.9rem; }
+}
