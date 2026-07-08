@@ -45,7 +45,7 @@ async function getStats() {
   const sessions = await getReadingSessions();
   const totalStories   = sessions.length;
   const totalTimeMins  = Math.round(sessions.reduce((s, r) => s + (r.readingTimeSecs || 0), 0) / 60);
-  const totalChoices   = sessions.filter(s => s.choiceMade).length;
+  const totalChoices   = sessions.filter(s => s.quizPassed).length;
   return { totalStories, totalTimeMins, totalChoices, sessions };
 }
 
@@ -122,6 +122,19 @@ async function getWeeklyProgress() {
   } catch (e) { console.warn('Firebase get weekly failed:', e.message); return 0; }
 }
 
+/* ══════════════════════════════════════════════════════════
+   CONTACT MESSAGES
+══════════════════════════════════════════════════════════ */
+async function saveContactMessage(name, email, message) {
+  try {
+    await addDoc(collection(db, 'contactMessages'), {
+      name, email, message,
+      sentAt: new Date().toISOString()
+    });
+    return true;
+  } catch (e) { console.warn('Contact save failed:', e.message); return false; }
+}
+
 /* ── Expose everything ───────────────────────────────────── */
 window.saveReadingSession      = saveReadingSession;
 window.getReadingSessions      = getReadingSessions;
@@ -135,3 +148,4 @@ window.saveBadgesToFirebase    = saveBadgesToFirebase;
 window.getBadgesFromFirebase   = getBadgesFromFirebase;
 window.saveWeeklyProgress      = saveWeeklyProgress;
 window.getWeeklyProgress       = getWeeklyProgress;
+window.saveContactMessage      = saveContactMessage;

@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="animations.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>html, body { overflow:hidden; height:100%; }</style>
 </head>
 <body>
 
@@ -29,87 +30,82 @@
     <div class="nav-pill-auth"></div>
   </nav>
 
-  <main class="page-wrapper" style="display:flex; align-items:center; justify-content:center; padding-top: 150px; padding-bottom: 80px;">
-    <div class="auth-container" style="width: 100%; max-width: 500px; padding: 0 24px;">
-      
-      <div class="glass-panel" style="padding: 50px 40px; text-align: center;">
-        <h1 class="dreamy-title" style="font-size: 2.2rem; margin-bottom: 32px;">Get in <span>Touch</span></h1>
-        <p style="color: rgba(255,255,255,0.7); font-weight: 600; margin-bottom: 32px;">Have a question or a magical idea? Send us a message!</p>
-        
-        <form id="contactForm" style="display: flex; flex-direction: column; gap: 20px; text-align: left;">
+  <main style="height:calc(100vh - 80px); margin-top:80px; display:flex; align-items:center; justify-content:center; padding:0 24px; box-sizing:border-box; overflow:hidden;">
+    <div style="width:100%; max-width:480px;">
+
+      <div style="
+        background: rgba(5,2,20,0.82);
+        backdrop-filter: blur(28px);
+        border: 1.5px solid rgba(168,85,247,0.4);
+        border-radius: 32px;
+        padding: 28px 36px 24px;
+        text-align: center;
+        box-shadow: 0 0 80px rgba(168,85,247,0.2), 0 24px 48px rgba(0,0,0,0.5);
+        position: relative; overflow: hidden;
+      ">
+        <!-- shimmer top line -->
+        <div style="position:absolute;top:0;left:8%;right:8%;height:1.5px;background:linear-gradient(90deg,transparent,rgba(168,85,247,0.8),rgba(236,72,153,0.8),transparent);"></div>
+
+        <h1 class="dreamy-title" style="font-size:1.8rem; margin-bottom:6px;">Get in <span>Touch</span></h1>
+        <p style="color:rgba(255,255,255,0.5); font-size:13px; margin-bottom:20px;">Have a question or a magical idea? Send us a message!</p>
+
+        <form id="contactForm" style="display:flex; flex-direction:column; gap:12px; text-align:left;">
           <div>
-            <label class="form-label" style="display:block; margin-bottom:8px; font-weight:700;">Your Name</label>
-            <input type="text" class="form-input" placeholder="Explorer Name" required style="background: rgba(255,255,255,0.05);">
-          </div>
-          
-          <div>
-            <label class="form-label" style="display:block; margin-bottom:8px; font-weight:700;">Email Address</label>
-            <input type="email" class="form-input" placeholder="hello@magic.com" required style="background: rgba(255,255,255,0.05);">
+            <label style="display:block; margin-bottom:5px; font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:rgba(255,255,255,0.45);">Your Name</label>
+            <input type="text" placeholder="Explorer Name" required style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);border:1.5px solid rgba(168,85,247,0.3);border-radius:14px;padding:11px 16px;color:#fff;font-size:14px;outline:none;font-family:inherit;">
           </div>
 
           <div>
-            <label class="form-label" style="display:block; margin-bottom:8px; font-weight:700;">What's on your mind?</label>
-            <textarea class="form-input" rows="4" placeholder="Type your message here..." style="background: rgba(255,255,255,0.05); resize: none; border-radius: 20px;"></textarea>
+            <label style="display:block; margin-bottom:5px; font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:rgba(255,255,255,0.45);">Email Address</label>
+            <input type="email" placeholder="hello@magic.com" required style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);border:1.5px solid rgba(168,85,247,0.3);border-radius:14px;padding:11px 16px;color:#fff;font-size:14px;outline:none;font-family:inherit;">
           </div>
 
-          <button type="button" class="btn dreamy-btn-pink jelly-hover" style="width: 100%; margin-top: 10px;" onclick="alert('Message Sent! 🦉')">Send Message ✨</button>
+          <div>
+            <label style="display:block; margin-bottom:5px; font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:rgba(255,255,255,0.45);">Message</label>
+            <textarea placeholder="Type your message here..." rows="3" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);border:1.5px solid rgba(168,85,247,0.3);border-radius:14px;padding:11px 16px;color:#fff;font-size:14px;outline:none;font-family:inherit;resize:none;"></textarea>
+          </div>
+
+          <button type="button" class="btn dreamy-btn-pink jelly-hover" style="width:100%; padding:13px; font-size:15px; margin-top:4px;" onclick="sendContact()">Send Message</button>
         </form>
 
-        <div style="margin-top: 40px; border-top: 1.5px solid rgba(255,255,255,0.1); padding-top: 30px;">
-          <p style="color: rgba(255,255,255,0.5); font-size: 14px;">You can also email us at <br> <strong style="color: var(--candy-yellow);">supportstorymagic.ai@gmail.com</strong></p>
+        <div style="margin-top:16px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.08);">
+          <p style="color:rgba(255,255,255,0.4); font-size:12px; margin:0;">Or email us directly at <a href="https://mail.google.com/mail/?view=cm&to=supportstorymagic.ai@gmail.com" target="_blank" style="color:#fbbf24; font-weight:700; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">supportstorymagic.ai@gmail.com</a></p>
         </div>
       </div>
 
     </div>
   </main>
 
-  <footer class="pro-footer">
-    <div class="footer-container">
-      <div class="footer-brand">
-        <img src="images/Logo.png" alt="StoryMagic Logo" class="footer-logo-img">
-        <p>Making learning to read a magical, unforgettable <br> experience through personalized AI stories.</p>
-        <div class="footer-socials">
-          <a href="https://www.instagram.com/storymagic_ai?igsh=amZ4OW9lZWNyd21r&amp;utm_source=qr" target="_blank" class="footer-social-btn social-instagram" title="Instagram">
-            <img src="images/instagram.webp" alt="Instagram" class="social-icon-img"/>
-          </a>
-          <a href="https://www.tiktok.com/@storymagic_ai?_r=1&amp;_t=ZS-95WrXclgNGr" target="_blank" class="footer-social-btn social-tiktok" title="TikTok">
-            <img src="images/tik tok.webp" alt="TikTok" class="social-icon-img"/>
-          </a>
-          <a href="https://www.youtube.com/@supportstorymagicai" target="_blank" class="footer-social-btn social-youtube" title="YouTube">
-            <img src="images/youtube.png" alt="YouTube" class="social-icon-img"/>
-          </a>
-          <a href="https://www.linkedin.com/in/storymagic-ai" class="footer-social-btn social-linkedin" title="LinkedIn">
-            <img src="images/linkedin.png" alt="LinkedIn" class="social-icon-img"/>
-          </a>
-        </div>
-      </div>
-      <div class="footer-links">
-        <div class="footer-col">
-          <h4>Explore</h4>
-          <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="library.html">Library</a></li>
-            <li><a href="characters.html">Characters</a></li>
-            <li><a href="parent.html">Parents Dashboard</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Support</h4>
-          <ul>
-            <li><a href="about.html">About Us</a></li>
-            <li><a href="contact.html">Contact Us</a></li>
-            <li><a href="privacy.html">Privacy Policy</a></li>
-            <li><a href="terms.html">Terms of Service</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2026 StoryMagic AI by Nirumalar Santharan. All rights reserved. Created with ❤️ for young explorers.</p>
-    </div>
-  </footer>
 
   <script src="auth.js"></script>
+  <script type="module" src="firebase-db.js"></script>
   <script src="animations.js"></script>
+  <script>
+    async function sendContact() {
+      const inputs   = document.querySelectorAll('#contactForm input, #contactForm textarea');
+      const name     = inputs[0].value.trim();
+      const email    = inputs[1].value.trim();
+      const message  = inputs[2].value.trim();
+      if (!name || !email || !message) { alert('Please fill in all fields!'); return; }
+
+      const btn = document.querySelector('#contactForm button');
+      btn.textContent = 'Sending…';
+      btn.disabled = true;
+
+      // Save to Firebase
+      if (typeof window.saveContactMessage === 'function') {
+        await window.saveContactMessage(name, email, message);
+      }
+
+      btn.textContent = 'Sent!';
+      btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
+      setTimeout(() => {
+        btn.textContent = 'Send Message';
+        btn.style.background = '';
+        btn.disabled = false;
+        document.getElementById('contactForm').reset();
+      }, 2500);
+    }
+  </script>
 </body>
 </html>

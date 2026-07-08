@@ -751,6 +751,12 @@
 
   <script src="auth.js"></script>
   <script>
+    // Auto-select Parent tab if redirected from access denied overlay
+    if (sessionStorage.getItem('loginTab') === 'parent') {
+      sessionStorage.removeItem('loginTab');
+      document.addEventListener('DOMContentLoaded', () => switchTab('parent'));
+    }
+
     /* ── Tab Switcher ─────────────────────────────────────── */
     function switchTab(role) {
       const parentPanel = document.getElementById('parentPanel');

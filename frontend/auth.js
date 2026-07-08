@@ -6,7 +6,55 @@
 document.addEventListener('DOMContentLoaded', () => {
     injectAuthStyles();
     updateNavigation();
+    initLogoLightbox();
 });
+
+/* ─────────────────────────────────────────────────────────────
+ * initLogoLightbox — click logo to see it bigger
+ * ───────────────────────────────────────────────────────────── */
+function initLogoLightbox() {
+    const logoImg = document.querySelector('.nav-logo-img');
+    if (!logoImg) return;
+
+    // Make logo feel clickable
+    logoImg.style.cursor = 'zoom-in';
+
+    // Create lightbox
+    const overlay = document.createElement('div');
+    overlay.id = 'logoLightbox';
+    overlay.style.cssText = `
+        display:none; position:fixed; inset:0; z-index:99999;
+        background:rgba(4,2,18,0.88); backdrop-filter:blur(12px);
+        align-items:center; justify-content:center;
+        animation:fadeIn 0.25s ease;
+        cursor:zoom-out;
+    `;
+    overlay.innerHTML = `
+        <div style="text-align:center; animation:popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);">
+            <img src="images/Logo.png" alt="StoryMagic AI Logo"
+                style="width:280px; height:280px; object-fit:contain; border-radius:50%;
+                       border:4px solid rgba(168,85,247,0.5);
+                       box-shadow:0 0 80px rgba(168,85,247,0.5), 0 0 160px rgba(236,72,153,0.3);
+                       background:rgba(10,6,30,0.8);">
+            <p style="color:rgba(255,255,255,0.6); margin-top:18px; font-size:14px; font-weight:600; letter-spacing:1px;">
+                StoryMagic AI
+            </p>
+            <p style="color:rgba(255,255,255,0.3); font-size:12px; margin-top:4px;">Click anywhere to close</p>
+        </div>`;
+    document.body.appendChild(overlay);
+
+    // Open on logo click
+    logoImg.addEventListener('click', (e) => {
+        e.preventDefault();
+        overlay.style.display = 'flex';
+    });
+
+    // Close on click outside or Escape
+    overlay.addEventListener('click', () => { overlay.style.display = 'none'; });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') overlay.style.display = 'none';
+    });
+}
 
 /* ─────────────────────────────────────────────────────────────
  * injectAuthStyles — adds nav button CSS once into <head>
@@ -159,6 +207,7 @@ function updateNavigation() {
             linksContainer.innerHTML = `
                 <a href="index.html">Home</a>
                 <a href="characters.html">Characters</a>
+                <a href="library.html">My Library</a>
             `;
         }
     }

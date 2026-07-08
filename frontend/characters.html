@@ -314,6 +314,7 @@
       const img   = el.dataset.img;
       const trait = el.dataset.trait;
       const glb   = el.dataset.glb;
+      const scale = parseFloat(el.dataset.scale) || 1.4;
 
       localStorage.setItem('selectedChar', char);
 
@@ -328,7 +329,7 @@
       if (glb && typeof window.loadBannerModel === 'function') {
         avatar.style.opacity = '0';
         bannerCanvas.style.display = 'block';
-        window.loadBannerModel(glb, () => {
+        window.loadBannerModel(glb, scale, () => {
           bannerCanvas.style.opacity = '1';
         });
       } else {
@@ -468,7 +469,8 @@
     /* ── Banner viewer (shared, loads on character select) ── */
     const bannerState = { renderer: null, animId: null, mixer: null, model: null, scene: null, clock: new THREE.Clock() };
 
-    window.loadBannerModel = function(glbPath, onReady) {
+    window.loadBannerModel = function(glbPath, scaleTarget, onReady) {
+      if (typeof scaleTarget === 'function') { onReady = scaleTarget; scaleTarget = 1.4; }
       const canvas = document.getElementById('bannerCanvas');
       const W = 200, H = 320;
 
@@ -489,7 +491,7 @@
         glbPath,
         (gltf) => {
           const model = gltf.scene;
-          fitModel(model);
+          fitModel(model, scaleTarget || 1.4);
           bannerState.scene.add(model);
           bannerState.model = model;
 

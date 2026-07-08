@@ -155,14 +155,13 @@
   <!-- Access Denied Overlay (shown to non-parents) -->
   <div id="accessDeniedOverlay" role="alertdialog" aria-modal="true" aria-labelledby="deniedTitle">
     <div class="denied-card">
-      <span class="denied-icon">🔐</span>
       <h2 class="denied-title" id="deniedTitle">Parents <span>Only!</span></h2>
       <p class="denied-msg">
         This dashboard is reserved for parents.<br>
         Please sign in with a <strong style="color:#c4b5fd;">Parent account</strong> to access child progress, settings, and controls.
       </p>
       <div class="denied-btns">
-        <a href="login.html" class="denied-btn denied-btn-primary">🛡️ Parent Login</a>
+        <a href="#" onclick="sessionStorage.setItem('loginTab','parent'); localStorage.removeItem('currentUser'); window.location.href='login.html';" class="denied-btn denied-btn-primary">Parent Login</a>
         <a href="index.html" class="denied-btn denied-btn-secondary">Go Home</a>
       </div>
       <p class="denied-countdown" id="deniedCountdown"></p>
@@ -215,7 +214,7 @@
         <div class="dash-stat-card" style="--sc:#ec4899;">
           <div class="dash-stat-icon"><i class="fa-solid fa-star"></i></div>
           <div class="dash-stat-num" id="statChoices">0</div>
-          <div class="dash-stat-label">Choices Made</div>
+          <div class="dash-stat-label">Quizzes Passed</div>
         </div>
       </div>
 
