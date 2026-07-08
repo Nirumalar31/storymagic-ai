@@ -2663,8 +2663,16 @@ input[type="file"]#avatarUpload {
   /* Reading log table scrollable */
   #tab-reading-log .glass-panel { overflow: hidden !important; }
   #tab-reading-log .glass-panel > div { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
-  .dash-log-table { min-width: 480px; font-size: 12px !important; }
-  .dash-log-table th, .dash-log-table td { padding: 10px 10px !important; }
+  .dash-log-table { min-width: 0 !important; width: 100% !important; font-size: 12px !important; }
+  .dash-log-table th, .dash-log-table td { padding: 8px 8px !important; }
+  /* Hide less important columns on mobile */
+  .dash-log-table th:nth-child(2),
+  .dash-log-table td:nth-child(2),
+  .dash-log-table th:nth-child(6),
+  .dash-log-table td:nth-child(6) { display: none !important; }
+  /* Story column sticky */
+  .dash-log-table th:nth-child(1),
+  .dash-log-table td:nth-child(1) { position: sticky; left: 0; background: rgba(5,2,20,0.95); z-index: 2; max-width: 100px; white-space: normal; word-break: break-word; }
 }
 
 /* ── Mobile (480px) ───────────────────────────── */
