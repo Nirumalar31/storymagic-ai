@@ -258,7 +258,7 @@
     @keyframes spinRing { to { transform: rotate(360deg); } }
     .magic-wand-center { font-size: 2.2rem; animation: wandPulse 1s ease-in-out infinite; }
     @keyframes wandPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.28)} }
-    .loading-tips { color:rgba(255,255,255,0.6); font-size:15px; margin-top:14px; transition:opacity 0.5s; }
+    .loading-tips { color:rgba(255,255,255,0.85); font-size:16px; margin-top:14px; transition:opacity 0.5s; text-shadow:0 2px 8px rgba(0,0,0,0.5); }
   </style>
 </head>
 <body>
@@ -447,7 +447,7 @@
         const imgSrc = heroImages[char];
         const avatarDiv = document.getElementById('heroEmoji').parentElement;
         if (imgSrc) {
-          avatarDiv.innerHTML = `<img src="${imgSrc}" alt="${char}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+          avatarDiv.innerHTML = `<img src="${imgSrc}" alt="${char}" style="width:90%;height:90%;border-radius:50%;object-fit:contain;">`;
         }
         document.getElementById('heroName').textContent = char + ' is your hero!';
         document.getElementById('heroSub').textContent  = 'Tap here to change your character →';
@@ -504,7 +504,7 @@
       const payload = { name: nameInput, prompt: "a fun adventure", theme: selectedTheme, character: selectedCharacter, age: mappedAge };
 
       try {
-        const res = await fetch('https://storymagic-ai.onrender.com/generate-story', {
+        const res = await fetch('/generate-story', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -517,7 +517,7 @@
           name: nameInput, age: mappedAge,
           moral: data.moral || '', wrongMorals: data.wrongMorals || [], quiz: data.quiz || null
         }));
-        window.location.href = 'https://storymagic-ai.onrender.com/story';
+        window.location.href = '/story';
       } catch (err) {
         const fallback = buildFallbackStory(nameInput, selectedTheme, selectedCharacter);
         localStorage.setItem('storyData', JSON.stringify(fallback));
