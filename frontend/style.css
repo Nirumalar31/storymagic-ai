@@ -2643,6 +2643,11 @@ input[type="file"]#avatarUpload {
   .voice-card       { min-width: 56px; }
   .story-nav-controls { position: relative !important; padding: 12px 8px !important; background: rgba(255,255,255,0.6); border-radius: 16px; margin-top: 8px; }
   .story-nav-controls .btn { padding: 10px 16px; font-size: 0.88rem; }
+  /* Hide footer on story page mobile */
+  .pro-footer { display: none !important; }
+  /* Narrator bar scrollable */
+  .voice-avatar-bar { overflow-x: auto !important; }
+  .voice-avatar-row { flex-wrap: nowrap !important; overflow-x: auto; padding-bottom: 4px; }
 
   /* Library */
   .lib-grid { grid-template-columns: 1fr 1fr; }
