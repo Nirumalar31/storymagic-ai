@@ -2660,19 +2660,20 @@ input[type="file"]#avatarUpload {
   .dash-stat-card { width: 100% !important; }
   .dash-tab-inner { padding: 0 12px 40px !important; }
   .dash-panel { padding: 20px 16px !important; overflow: visible !important; }
-  /* Reading log table scrollable */
-  #tab-reading-log .glass-panel { overflow: hidden !important; }
-  #tab-reading-log .glass-panel > div { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
-  .dash-log-table { min-width: 0 !important; width: 100% !important; font-size: 12px !important; }
-  .dash-log-table th, .dash-log-table td { padding: 8px 8px !important; }
-  /* Hide less important columns on mobile */
-  .dash-log-table th:nth-child(2),
-  .dash-log-table td:nth-child(2),
-  .dash-log-table th:nth-child(6),
-  .dash-log-table td:nth-child(6) { display: none !important; }
-  /* Story column sticky */
-  .dash-log-table th:nth-child(1),
-  .dash-log-table td:nth-child(1) { position: sticky; left: 0; background: rgba(5,2,20,0.95); z-index: 2; max-width: 100px; white-space: normal; word-break: break-word; }
+  /* Reading log — card layout on mobile */
+  #tab-reading-log .glass-panel { overflow: visible !important; }
+  #tab-reading-log .glass-panel > div { overflow-x: unset !important; }
+  .dash-log-table thead { display: none !important; }
+  .dash-log-table, .dash-log-table tbody, .dash-log-table tr { display: block !important; width: 100% !important; }
+  .dash-log-table tr { background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 10px; padding: 12px 14px !important; border: 1px solid rgba(255,255,255,0.08) !important; }
+  .dash-log-table td { display: flex !important; justify-content: space-between; padding: 4px 0 !important; font-size: 13px !important; border: none !important; color: rgba(255,255,255,0.85) !important; }
+  .dash-log-table td:nth-child(1)::before { content: "📖"; margin-right: 6px; }
+  .dash-log-table td:nth-child(2)::before { content: "Theme: "; color: rgba(255,255,255,0.45); font-size:11px; }
+  .dash-log-table td:nth-child(3)::before { content: "Date: ";  color: rgba(255,255,255,0.45); font-size:11px; }
+  .dash-log-table td:nth-child(4)::before { content: "Time: ";  color: rgba(255,255,255,0.45); font-size:11px; }
+  .dash-log-table td:nth-child(5)::before { content: "Quiz: ";  color: rgba(255,255,255,0.45); font-size:11px; }
+  .dash-log-table td:nth-child(6)::before { content: "Feeling: "; color: rgba(255,255,255,0.45); font-size:11px; }
+  .dash-log-table td:nth-child(1) { font-weight: 700; font-size: 14px !important; margin-bottom: 4px; }
 }
 
 /* ── Mobile (480px) ───────────────────────────── */
