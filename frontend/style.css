@@ -2632,14 +2632,17 @@ input[type="file"]#avatarUpload {
   .hero-cards        { grid-template-columns: 1fr 1fr; gap: 12px; }
   .theme-grid        { grid-template-columns: 1fr 1fr; gap: 10px; }
 
-  /* Story page */
-  .storybook-container { padding: 0; margin-top: 60px; }
-  .storybook-book      { flex-direction: column !important; border-radius: 12px; }
-  .left-page  { height: 260px !important; min-height: unset !important; }
-  .right-page { padding: 20px 24px 16px 24px !important; }
+  /* Story page — scrollable on mobile */
+  .storybook-container { padding: 0; margin-top: 60px; overflow-y: auto !important; height: auto !important; }
+  .storybook-book      { flex-direction: column !important; border-radius: 12px; overflow: visible !important; height: auto !important; }
+  .left-page  { height: 240px !important; min-height: unset !important; flex-shrink: 0; }
+  .right-page { padding: 20px 24px 80px 24px !important; overflow: visible !important; height: auto !important; }
+  .story-text-container { overflow: visible !important; height: auto !important; }
   .story-text-container p { font-size: 1rem !important; line-height: 1.7 !important; }
   .voice-avatar-row { gap: 8px; }
   .voice-card       { min-width: 56px; }
+  /* Sticky nav controls at bottom on mobile */
+  .story-nav-controls { position: fixed !important; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.97); padding: 10px 16px; z-index: 500; box-shadow: 0 -2px 12px rgba(0,0,0,0.12); border-top: 1px solid rgba(0,0,0,0.08); }
   .story-nav-controls .btn { padding: 10px 16px; font-size: 0.88rem; }
 
   /* Library */

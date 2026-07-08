@@ -226,6 +226,9 @@
 
     /* ── Fit book in one screen, maximised ───────── */
     html, body { overflow: hidden; height: 100%; }
+    @media (max-width: 768px) {
+      html, body { overflow-y: auto !important; height: auto !important; }
+    }
     main.page-wrapper {
       padding-top: 0 !important;
       height: calc(100vh - 80px) !important;
