@@ -815,8 +815,10 @@
         }
         const registry = JSON.parse(localStorage.getItem('parentRegistry') || '{}');
         const entry = registry[email.toLowerCase()];
-        const parentName   = (typeof entry === 'object' ? entry.name   : entry) || 'Parent';
-        const parentAvatar = (typeof entry === 'object' ? entry.avatar : null);
+        const parentName   = (typeof entry === 'object' ? entry.name      : entry) || 'Parent';
+        const parentAvatar = (typeof entry === 'object' ? entry.avatar    : null);
+        const childName    = (typeof entry === 'object' ? entry.childName : null);
+        if (childName) localStorage.setItem('setting_childName', childName);
         mockLogin(email, parentName, 'parent', null, parentAvatar);
       } catch (err) {
         btn.textContent = 'Sign In as Parent';

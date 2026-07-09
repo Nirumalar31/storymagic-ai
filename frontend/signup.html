@@ -57,8 +57,13 @@
 
 
           <div style="text-align:left;">
-            <label class="form-label" style="display:block; margin-bottom:5px; font-weight:500;">Your Name</label>
-            <input type="text" class="form-input" placeholder="Your Name" required style="background:rgba(255,255,255,0.05);">
+            <label class="form-label" style="display:block; margin-bottom:5px; font-weight:500;">Your Name (Parent)</label>
+            <input type="text" id="parentName" class="form-input" placeholder="Your Name" required style="background:rgba(255,255,255,0.05);">
+          </div>
+
+          <div style="text-align:left;">
+            <label class="form-label" style="display:block; margin-bottom:5px; font-weight:500;">Child's Name</label>
+            <input type="text" id="childNameSignup" class="form-input" placeholder="e.g. Mia, Leo, Sara..." required style="background:rgba(255,255,255,0.05);">
           </div>
 
           <div style="text-align:left;">
@@ -107,12 +112,14 @@
     }
 
     async function handleSignup() {
-      const inputs   = document.querySelectorAll('.form-input');
-      const name     = inputs[0].value.trim();
-      const email    = inputs[1].value.trim();
-      const password = inputs[2].value;
+      const inputs    = document.querySelectorAll('.form-input');
+      const name      = inputs[0].value.trim();
+      const childName = document.getElementById('childNameSignup').value.trim();
+      const email     = inputs[2].value.trim();
+      const password  = inputs[3].value;
 
-      if (!name || !email || !password) return showSignupError("Please fill in all fields!");
+      if (!name || !childName || !email || !password) return showSignupError("Please fill in all fields!");
+      if (childName.length < 2) return showSignupError("Please enter your child's name.");
       if (password.length < 6) return showSignupError("Password must be at least 6 characters.");
 
       const btn = document.querySelector('#signupForm button');
@@ -132,10 +139,13 @@
         console.warn('Firebase signup skipped:', err.message);
       }
 
-      // Save name + avatar in registry so login can retrieve them by email
+      // Save parent name + avatar + child name in registry
       const registry = JSON.parse(localStorage.getItem('parentRegistry') || '{}');
-      registry[email.toLowerCase()] = { name, avatar: selectedParentAvatar };
+      registry[email.toLowerCase()] = { name, avatar: selectedParentAvatar, childName };
       localStorage.setItem('parentRegistry', JSON.stringify(registry));
+
+      // Save child name so dashboard filters correctly after first login
+      localStorage.setItem('setting_childName', childName);
 
       // Show success then redirect to login
       document.getElementById('signupForm').style.display = 'none';
