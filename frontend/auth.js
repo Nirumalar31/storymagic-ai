@@ -252,6 +252,7 @@ function mockLogin(emailOrUsername, name = 'Little Explorer', role = 'child', av
         joined:      new Date().toLocaleDateString()
     };
     localStorage.setItem('currentUser', JSON.stringify(userData));
+    sessionStorage.setItem('_sm_active', '1'); // mark session as started via login
 
     const redirect = sessionStorage.getItem('redirectAfterLogin');
     sessionStorage.removeItem('redirectAfterLogin');

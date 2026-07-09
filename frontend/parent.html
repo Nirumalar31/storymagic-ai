@@ -734,7 +734,7 @@
     /* ── Guard: parent-only access ───────────────────────── */
     (function checkAccess() {
       const user = getCurrentUser();
-      if (!user || user.role !== 'parent') {
+      if (!user || user.role !== 'parent' || !sessionStorage.getItem('_sm_active')) {
         // Show overlay immediately
         const overlay = document.getElementById('accessDeniedOverlay');
         overlay.classList.add('visible');
