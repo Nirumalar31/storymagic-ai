@@ -734,11 +734,6 @@
     /* ── Guard: parent-only access ───────────────────────── */
     (function checkAccess() {
       const user = getCurrentUser();
-      // If no active session (tab reopened), go straight to login
-      if (!sessionStorage.getItem('_sm_active')) {
-        window.location.replace('login.html');
-        return;
-      }
       if (!user || user.role !== 'parent') {
         // Show overlay immediately
         const overlay = document.getElementById('accessDeniedOverlay');
@@ -844,11 +839,11 @@
       restoreGoal();
       loadChildProfile();
 
-      setTimeout(async () => {
-        // Retry until Firebase module is ready
+      (async () => {
+        // Wait for Firebase module to be ready
         let retries = 0;
-        while (typeof window.getStats !== 'function' && retries < 10) {
-          await new Promise(r => setTimeout(r, 200));
+        while (typeof window.getStats !== 'function' && retries < 40) {
+          await new Promise(r => setTimeout(r, 100));
           retries++;
         }
         if (typeof window.getStats !== 'function') return;
@@ -893,7 +888,7 @@
           else break;
         }
         document.getElementById('streakCount').textContent = `${streak} day${streak !== 1 ? 's' : ''}`;
-      }, 400);
+      })();
     });
 
     async function resetProgress() {

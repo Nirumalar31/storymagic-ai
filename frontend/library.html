@@ -290,7 +290,22 @@
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
-      // Wait up to 4s for Firebase module to be ready, then fall back to localStorage
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+      function applyChildFilter(list) {
+        if (currentUser.role === 'child') {
+          const childName = (currentUser.name || '').toLowerCase();
+          return list.filter(s => (s.name || '').toLowerCase() === childName);
+        }
+        return list;
+      }
+
+      // Show localStorage data immediately — no waiting
+      allSaved = applyChildFilter(getSaved());
+      renderBadges();
+      renderCards(allSaved);
+
+      // Then fetch Firebase in background and refresh if we get more data
       let waited = 0;
       while (typeof window.getSavedStoriesFromFirebase !== 'function' && waited < 4000) {
         await new Promise(r => setTimeout(r, 100));
@@ -299,29 +314,17 @@
       if (typeof window.getSavedStoriesFromFirebase === 'function') {
         const fb = await window.getSavedStoriesFromFirebase();
         if (fb.length) {
-          allSaved = fb;
+          allSaved = applyChildFilter(fb);
           localStorage.setItem('savedStories', JSON.stringify(fb));
-        } else {
-          allSaved = getSaved();
+          renderCards(allSaved);
         }
-      } else {
-        allSaved = getSaved();
       }
 
-      // If logged in as a child, only show that child's saved stories
-      const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-      if (currentUser.role === 'child') {
-        const childName = (currentUser.name || '').toLowerCase();
-        allSaved = allSaved.filter(s => (s.name || '').toLowerCase() === childName);
-      }
-
-      // Load badges from Firebase
+      // Update badges from Firebase
       if (typeof window.getBadgesFromFirebase === 'function') {
         const fb = await window.getBadgesFromFirebase();
-        if (fb.length) localStorage.setItem('earnedBadges', JSON.stringify(fb));
+        if (fb.length) { localStorage.setItem('earnedBadges', JSON.stringify(fb)); renderBadges(); }
       }
-      renderBadges();
-      renderCards(allSaved);
     });
 
     function renderCards(list) {
