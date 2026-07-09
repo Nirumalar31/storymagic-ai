@@ -561,26 +561,13 @@
         <p>Watch how StoryMagic AI brings your child's story to life</p>
       </div>
       <div class="video-frame-wrap">
-        <div id="ytFacade" onclick="loadYTVideo(this)" style="position:relative;cursor:pointer;width:100%;border-radius:12px;overflow:hidden;">
-          <img src="https://img.youtube.com/vi/Ri0NhbSjKCg/hqdefault.jpg" alt="Watch StoryMagic AI" style="width:100%;display:block;border-radius:12px;">
-          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:44px;background:#ff0000;border-radius:10px;display:flex;align-items:center;justify-content:center;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>
-          </div>
-        </div>
+        <iframe
+          src="https://www.youtube.com/embed/Ri0NhbSjKCg?autoplay=0&rel=0&modestbranding=1"
+          title="StoryMagic AI Promo"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
       </div>
-      <script>
-        function loadYTVideo(el) {
-          const wrap = el.parentElement;
-          const iframe = document.createElement('iframe');
-          iframe.src = 'https://www.youtube.com/embed/Ri0NhbSjKCg?autoplay=1&rel=0&modestbranding=1';
-          iframe.title = 'StoryMagic AI Promo';
-          iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-          iframe.allowFullscreen = true;
-          iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;border-radius:12px;';
-          wrap.style.position = 'relative';
-          el.replaceWith(iframe);
-        }
-      </script>
     </div>
 
     <!-- Right: Login Card -->
