@@ -799,22 +799,37 @@
           retries++;
         }
         if (typeof window.getStats !== 'function') return;
-        const { totalStories, totalTimeMins, totalChoices, sessions } = await window.getStats();
+        const { sessions } = await window.getStats();
 
-        animateCount(document.getElementById('statStories'), totalStories);
-        animateCount(document.getElementById('statTime'), totalTimeMins, 'm');
-        animateCount(document.getElementById('statChoices'), totalChoices);
+        // Filter sessions to only show THIS parent's linked child
+        const linkedChild = (localStorage.getItem('setting_childName') || '').trim().toLowerCase();
+        const filteredSessions = linkedChild
+          ? sessions.filter(s =>
+              (s.userId    || '').toLowerCase() === linkedChild ||
+              (s.childName || '').toLowerCase() === linkedChild ||
+              (s.name      || '').toLowerCase() === linkedChild
+            )
+          : sessions;
+
+        // Recalculate stats from filtered sessions only
+        const filteredStories   = filteredSessions.length;
+        const filteredTimeMins  = Math.round(filteredSessions.reduce((sum, s) => sum + (s.readingTimeSecs || 0), 0) / 60);
+        const filteredChoices   = filteredSessions.filter(s => s.quizPassed).length;
+
+        animateCount(document.getElementById('statStories'), filteredStories);
+        animateCount(document.getElementById('statTime'), filteredTimeMins, 'm');
+        animateCount(document.getElementById('statChoices'), filteredChoices);
 
         // Compute which of the last 28 days had a session (0 = today)
         const now = Date.now();
         const readDayOffsets = [...new Set(
-          sessions
+          filteredSessions
             .map(s => Math.floor((now - new Date(s.completedAt)) / 86400000))
             .filter(d => d >= 0 && d < 28)
         )];
         buildCalendar(readDayOffsets);
-        buildHistory(sessions);
-        buildLogTable(sessions);
+        buildHistory(filteredSessions);
+        buildLogTable(filteredSessions);
 
         // Calculate consecutive reading streak from today backwards
         const daySet = new Set(readDayOffsets);
@@ -867,7 +882,15 @@
       let done = 0;
       try {
         if (typeof window.getReadingSessions === 'function') {
-          const sessions = await window.getReadingSessions();
+          const allSessions = await window.getReadingSessions();
+          const linkedChild = (localStorage.getItem('setting_childName') || '').trim().toLowerCase();
+          const sessions = linkedChild
+            ? allSessions.filter(s =>
+                (s.userId    || '').toLowerCase() === linkedChild ||
+                (s.childName || '').toLowerCase() === linkedChild ||
+                (s.name      || '').toLowerCase() === linkedChild
+              )
+            : allSessions;
           // Count sessions from this week (Monday 00:00 onwards)
           const now = new Date();
           const dayOfWeek = now.getDay();
