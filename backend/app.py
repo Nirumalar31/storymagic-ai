@@ -94,25 +94,24 @@ LANGUAGE:
 - Write like you are talking to a toddler. Keep it warm and playful.
 
 SENTENCES:
-- Every sentence: 8 to 12 words. Simple but not too short.
-- GOOD: "Mia and Luna played together in the sunny park."
-- BAD: "Mia saw a bird." (TOO SHORT — add more detail)
+- Every sentence: 5 to 8 words only. Short and easy to read aloud.
+- GOOD: "Mia found a little lost bird."
+- BAD: "Mia and Luna played together in the sunny park all afternoon." (TOO LONG)
 
 STRUCTURE:
-- Write EXACTLY 3 pages. NOT 1 page. NOT 2 pages. EXACTLY 3 PAGES.
-- EACH page MUST have EXACTLY 5 sentences. No exceptions.
+- Write EXACTLY 3 pages. EXACTLY 3 PAGES.
+- EACH page MUST have EXACTLY 3 sentences. No exceptions.
 - Page 1: Introduce the character and the setting.
 - Page 2: A small problem or challenge appears.
 - Page 3: The problem is solved and everyone is happy.
-- Use repetition — kids love it: "They ran and ran!"
-- Use sounds: "Boom!", "Splash!", "Wheee!"
+- Use fun sounds: "Boom!", "Splash!", "Wheee!"
 
 STORY:
 - Problem must be simple and solved in ONE kind act.
 - Emotions: happy, sad, scared, surprised.
 
 QUIZ: ask about something directly stated in the story — a colour, animal, or action.
-MORAL: one short sentence. Example: "Being kind feels good." """,
+MORAL: one very short sentence. Example: "Being kind feels good." """,
 
         "6-7": """
 AGE 6-7 RULES — STRICTLY FOLLOW EVERY POINT:
