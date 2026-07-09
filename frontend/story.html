@@ -233,9 +233,12 @@
       flex-direction: column !important;
       box-sizing: border-box !important;
     }
-    @media (max-width: 1200px) {
+    @media (max-width: 1366px) {
       html, body { overflow-y: auto !important; height: auto !important; }
       main.page-wrapper { height: auto !important; min-height: calc(100vh - 80px) !important; }
+      .storybook-container:last-of-type { height: auto !important; overflow: visible !important; }
+      .storybook-book { overflow: visible !important; }
+      .right-page { overflow: visible !important; }
     }
     @media (max-width: 768px) {
       .right-page { overflow-y: visible !important; }
