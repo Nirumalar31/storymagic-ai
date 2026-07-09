@@ -147,9 +147,6 @@
       registry[email.toLowerCase()] = { name, avatar: selectedParentAvatar, childName };
       localStorage.setItem('parentRegistry', JSON.stringify(registry));
 
-      // Save child name so dashboard filters correctly after first login
-      localStorage.setItem('setting_childName', childName);
-
       // Show success then redirect to login
       document.getElementById('signupForm').style.display = 'none';
       document.getElementById('signupSuccess').style.display = 'block';

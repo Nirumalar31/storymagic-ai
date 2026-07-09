@@ -852,12 +852,14 @@
 
       // Check if name matches any registered child name (supports comma-separated list)
       const registeredChild = localStorage.getItem('setting_childName') || '';
-      if (registeredChild) {
-        const registeredNames = registeredChild.split(',').map(n => n.trim().toLowerCase()).filter(Boolean);
-        if (registeredNames.length > 0 && !registeredNames.includes(name.toLowerCase())) {
-          showError('childError', `❌ "${name}" is not registered. Please ask your parent to check the name.`);
-          return;
-        }
+      if (!registeredChild) {
+        showError('childError', 'Please ask your parent to log in on this device first.');
+        return;
+      }
+      const registeredNames = registeredChild.split(',').map(n => n.trim().toLowerCase()).filter(Boolean);
+      if (registeredNames.length > 0 && !registeredNames.includes(name.toLowerCase())) {
+        showError('childError', `"${name}" is not registered. Please ask your parent to check the name.`);
+        return;
       }
 
       const btn = document.getElementById('childLoginBtn');
