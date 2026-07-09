@@ -801,13 +801,14 @@
         if (typeof window.getStats !== 'function') return;
         const { sessions } = await window.getStats();
 
-        // Filter sessions to only show THIS parent's linked child
-        const linkedChild = (localStorage.getItem('setting_childName') || '').trim().toLowerCase();
-        const filteredSessions = linkedChild
+        // Filter sessions to only show THIS parent's linked children (supports multiple names)
+        const linkedChildRaw = (localStorage.getItem('setting_childName') || '').trim();
+        const linkedChildren = linkedChildRaw ? linkedChildRaw.split(',').map(n => n.trim().toLowerCase()).filter(Boolean) : [];
+        const filteredSessions = linkedChildren.length > 0
           ? sessions.filter(s =>
-              (s.userId    || '').toLowerCase() === linkedChild ||
-              (s.childName || '').toLowerCase() === linkedChild ||
-              (s.name      || '').toLowerCase() === linkedChild
+              linkedChildren.includes((s.userId    || '').toLowerCase()) ||
+              linkedChildren.includes((s.childName || '').toLowerCase()) ||
+              linkedChildren.includes((s.name      || '').toLowerCase())
             )
           : sessions;
 
@@ -883,12 +884,13 @@
       try {
         if (typeof window.getReadingSessions === 'function') {
           const allSessions = await window.getReadingSessions();
-          const linkedChild = (localStorage.getItem('setting_childName') || '').trim().toLowerCase();
-          const sessions = linkedChild
+          const linkedChildRaw2 = (localStorage.getItem('setting_childName') || '').trim();
+          const linkedChildren2 = linkedChildRaw2 ? linkedChildRaw2.split(',').map(n => n.trim().toLowerCase()).filter(Boolean) : [];
+          const sessions = linkedChildren2.length > 0
             ? allSessions.filter(s =>
-                (s.userId    || '').toLowerCase() === linkedChild ||
-                (s.childName || '').toLowerCase() === linkedChild ||
-                (s.name      || '').toLowerCase() === linkedChild
+                linkedChildren2.includes((s.userId    || '').toLowerCase()) ||
+                linkedChildren2.includes((s.childName || '').toLowerCase()) ||
+                linkedChildren2.includes((s.name      || '').toLowerCase())
               )
             : allSessions;
           // Count sessions from this week (Monday 00:00 onwards)

@@ -848,11 +848,14 @@
         return;
       }
 
-      // Check if name matches the registered child name
+      // Check if name matches any registered child name (supports comma-separated list)
       const registeredChild = localStorage.getItem('setting_childName') || '';
-      if (registeredChild && name.toLowerCase() !== registeredChild.toLowerCase()) {
-        showError('childError', `❌ "${name}" is not registered. Please ask your parent to check the name.`);
-        return;
+      if (registeredChild) {
+        const registeredNames = registeredChild.split(',').map(n => n.trim().toLowerCase()).filter(Boolean);
+        if (registeredNames.length > 0 && !registeredNames.includes(name.toLowerCase())) {
+          showError('childError', `❌ "${name}" is not registered. Please ask your parent to check the name.`);
+          return;
+        }
       }
 
       const btn = document.getElementById('childLoginBtn');
