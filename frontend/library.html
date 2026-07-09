@@ -303,6 +303,14 @@
       } else {
         allSaved = getSaved();
       }
+
+      // If logged in as a child, only show that child's saved stories
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      if (currentUser.role === 'child') {
+        const childName = (currentUser.name || '').toLowerCase();
+        allSaved = allSaved.filter(s => (s.name || '').toLowerCase() === childName);
+      }
+
       // Load badges from Firebase
       if (typeof window.getBadgesFromFirebase === 'function') {
         const fb = await window.getBadgesFromFirebase();
