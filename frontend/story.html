@@ -227,7 +227,7 @@
     /* ── Fit book in one screen, maximised ───────── */
     html, body { overflow: hidden; height: 100%; }
     @media (max-width: 768px) {
-      html, body { overflow: hidden !important; height: 100% !important; }
+      html, body { overflow-y: auto !important; height: auto !important; }
     }
     main.page-wrapper {
       padding-top: 0 !important;
@@ -235,6 +235,9 @@
       display: flex !important;
       flex-direction: column !important;
       box-sizing: border-box !important;
+    }
+    @media (max-width: 768px) {
+      main.page-wrapper { height: auto !important; min-height: calc(100vh - 80px) !important; }
     }
     .storybook-container { padding: 6px 20px !important; }
     .storybook-container:last-of-type {
