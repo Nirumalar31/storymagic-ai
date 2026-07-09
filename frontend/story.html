@@ -226,9 +226,6 @@
 
     /* ── Fit book in one screen, maximised ───────── */
     html, body { overflow: hidden; height: 100%; }
-    @media (max-width: 768px) {
-      html, body { overflow-y: auto !important; height: auto !important; }
-    }
     main.page-wrapper {
       padding-top: 0 !important;
       height: calc(100vh - 80px) !important;
@@ -237,21 +234,16 @@
       box-sizing: border-box !important;
     }
     @media (max-width: 768px) {
-      html, body { overflow-y: auto !important; height: auto !important; }
-      main.page-wrapper { height: auto !important; min-height: unset !important; }
-      .pro-footer, .bg-stars, .orb { display: none !important; }
+      .right-page { overflow-y: auto !important; }
       .story-nav-controls {
-        position: fixed !important;
+        position: sticky !important;
         bottom: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        z-index: 999 !important;
-        background: rgba(15, 10, 40, 0.97) !important;
-        padding: 10px 12px env(safe-area-inset-bottom, 10px) !important;
-        margin-top: 0 !important;
-        border-top: 1px solid rgba(255,255,255,0.1) !important;
+        z-index: 10 !important;
+        background: rgba(253, 249, 243, 0.97) !important;
+        padding: 10px 12px !important;
+        margin-top: auto !important;
+        border-top: 1px solid rgba(0,0,0,0.08) !important;
       }
-      .right-page { padding-bottom: 90px !important; }
     }
     .storybook-container { padding: 6px 20px !important; }
     .storybook-container:last-of-type {
