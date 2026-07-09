@@ -84,13 +84,8 @@ def generate_story():
     character = data.get("character", "")
     age       = data.get("age", "4-5")
 
-    # Determine page count by age
-    if age == "4-5":
-        page_count = 3
-    elif age == "6-7":
-        page_count = 4
-    else:
-        page_count = 3
+    # Determine page count by age — all 3 pages to match video assets
+    page_count = 3
 
     # Age-specific writing rules
     age_rules = {
@@ -98,27 +93,29 @@ def generate_story():
 AGE 4-5 RULES — STRICTLY FOLLOW EVERY POINT:
 
 LANGUAGE:
-- Use ONLY words a 4-year-old already knows: go, big, small, red, blue, happy, sad, run, jump, look, find, help, home, friend, loud, soft, warm, bright.
-- NEVER use: discovered, however, perhaps, creature, enormous, ancient, mysterious, adventure, journey — these are too hard.
-- Write like you are TALKING to a toddler out loud. Keep it playful and warm.
+- Use ONLY simple words a 4-year-old knows: go, big, small, happy, sad, run, jump, look, find, help, home, friend, warm, bright, funny, good, kind, play, share.
+- Write like you are talking to a toddler. Keep it warm and playful.
 
 SENTENCES:
-- Every sentence: MAX 8 words. No exceptions.
-- GOOD: "The cat was big and fluffy."
-- BAD: "The enormous feline possessed a remarkably soft coat."
+- Every sentence: 8 to 12 words. Simple but not too short.
+- GOOD: "Mia and Luna played together in the sunny park."
+- BAD: "Mia saw a bird." (TOO SHORT — add more detail)
 
 STRUCTURE:
-- Write EXACTLY 3 pages.
-- Each page: 4 to 5 sentences.
-- Use repetition — kids love it: "They ran and ran and ran!"
+- Write EXACTLY 3 pages. NOT 1 page. NOT 2 pages. EXACTLY 3 PAGES.
+- EACH page MUST have EXACTLY 5 sentences. No exceptions.
+- Page 1: Introduce the character and the setting.
+- Page 2: A small problem or challenge appears.
+- Page 3: The problem is solved and everyone is happy.
+- Use repetition — kids love it: "They ran and ran!"
 - Use sounds: "Boom!", "Splash!", "Wheee!"
 
 STORY:
-- Problem must be simple and solved in ONE step.
-- Emotions: happy, sad, scared, surprised. Nothing deeper.
+- Problem must be simple and solved in ONE kind act.
+- Emotions: happy, sad, scared, surprised.
 
-QUIZ: ask about a colour, animal, or object directly stated in the text.
-MORAL: one short sentence any 4-year-old understands. Example: "Being kind feels good." """,
+QUIZ: ask about something directly stated in the story — a colour, animal, or action.
+MORAL: one short sentence. Example: "Being kind feels good." """,
 
         "6-7": """
 AGE 6-7 RULES — STRICTLY FOLLOW EVERY POINT:
@@ -134,8 +131,8 @@ SENTENCES:
 - BAD: "Despite her trepidation, she courageously proceeded into the unknown."
 
 STRUCTURE:
-- Write EXACTLY 4 pages.
-- Each page: 3 to 5 sentences.
+- Write EXACTLY 3 pages.
+- Each page: 5 to 6 sentences.
 - Include ONE small problem the character solves with a simple idea.
 - Add ONE fun surprise (a talking animal, a glowing door, a kind stranger).
 
@@ -227,7 +224,7 @@ Return ONLY valid JSON with NO markdown, NO code fences, NO extra text — just 
                 )
                 content = response.choices[0].message.content
             else:
-                # Fallback for old openai v0.28
+                # Fallback for old openai 
                 response = client.ChatCompletion.create(
                     model="gpt-3.5-turbo",
                     messages=[{"role": "system", "content": system_prompt}],
