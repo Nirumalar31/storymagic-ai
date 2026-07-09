@@ -848,6 +848,13 @@
         return;
       }
 
+      // Check if name matches the registered child name
+      const registeredChild = localStorage.getItem('setting_childName') || '';
+      if (registeredChild && name.toLowerCase() !== registeredChild.toLowerCase()) {
+        showError('childError', `❌ "${name}" is not registered. Please ask your parent to check the name.`);
+        return;
+      }
+
       const btn = document.getElementById('childLoginBtn');
       btn.textContent = 'Loading your adventure…';
       btn.disabled = true;
