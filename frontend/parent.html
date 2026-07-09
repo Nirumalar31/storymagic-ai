@@ -658,9 +658,9 @@
         <div class="footer-col">
           <h4>Explore</h4>
           <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="library.html">Library</a></li>
-            <li><a href="characters.html">Characters</a></li>
+            <li><a href="index.html"      onclick="return warnChildPage(event,'index.html')">Home</a></li>
+            <li><a href="library.html"    onclick="return warnChildPage(event,'library.html')">Library</a></li>
+            <li><a href="characters.html" onclick="return warnChildPage(event,'characters.html')">Characters</a></li>
             <li><a href="parent.html">Parents Dashboard</a></li>
           </ul>
         </div>
@@ -680,9 +680,69 @@
     </div>
   </footer>
 
+  <!-- Child Page Warning Modal -->
+  <div id="childPageOverlay" style="
+    display:none; position:fixed; inset:0; z-index:9998;
+    background:rgba(4,2,18,0.8); backdrop-filter:blur(12px);
+    align-items:center; justify-content:center; padding:24px;">
+    <div style="
+      background:rgba(12,8,40,0.95);
+      border:1.5px solid rgba(168,85,247,0.35);
+      border-radius:28px; padding:44px 40px;
+      max-width:400px; width:100%; text-align:center;
+      box-shadow:0 40px 80px rgba(0,0,0,0.6);
+      animation:popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);">
+      <span style="font-size:56px;display:block;margin-bottom:16px;">🧒</span>
+      <h2 style="font-family:var(--font-display);font-size:1.6rem;color:#fff;margin:0 0 12px;">This is a Child's Page!</h2>
+      <p style="color:rgba(255,255,255,0.55);font-size:14px;line-height:1.7;margin:0 0 28px;">
+        This page is designed for your child to explore stories and characters.<br><br>
+        You can share this page with your child to let them enjoy the magic!
+      </p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button onclick="document.getElementById('childPageOverlay').style.display='none'" style="
+          padding:13px 28px; border-radius:14px; border:1.5px solid rgba(255,255,255,0.15);
+          background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.8);
+          font-size:15px; font-weight:700; cursor:pointer; font-family:inherit;
+          transition:all 0.2s;"
+          onmouseover="this.style.background='rgba(255,255,255,0.13)'"
+          onmouseout="this.style.background='rgba(255,255,255,0.07)'">
+          Stay Here
+        </button>
+        <button id="childPageContinueBtn" onclick="goToChildPage()" style="
+          padding:13px 28px; border-radius:14px; border:none;
+          background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff;
+          font-size:15px; font-weight:700; cursor:pointer; font-family:inherit;
+          box-shadow:0 6px 24px rgba(124,58,237,0.4);
+          transition:all 0.2s;"
+          onmouseover="this.style.transform='translateY(-2px)'"
+          onmouseout="this.style.transform=''">
+          Continue Anyway
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="auth.js"></script>
   <script type="module" src="firebase-db.js"></script>
   <script>
+    /* ── Child page warning ──────────────────────────────── */
+    let _childPageTarget = '';
+    function warnChildPage(e, url) {
+      e.preventDefault();
+      _childPageTarget = url;
+      const overlay = document.getElementById('childPageOverlay');
+      overlay.style.display = 'flex';
+      return false;
+    }
+    function goToChildPage() {
+      document.getElementById('childPageOverlay').style.display = 'none';
+      if (_childPageTarget) window.location.href = _childPageTarget;
+    }
+    // Close on backdrop click
+    document.getElementById('childPageOverlay').addEventListener('click', function(e) {
+      if (e.target === this) this.style.display = 'none';
+    });
+
     /* ── Guard: parent-only access ───────────────────────── */
     (function checkAccess() {
       const user = getCurrentUser();
