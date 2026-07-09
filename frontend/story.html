@@ -233,8 +233,12 @@
       flex-direction: column !important;
       box-sizing: border-box !important;
     }
+    @media (max-width: 1200px) {
+      html, body { overflow-y: auto !important; height: auto !important; }
+      main.page-wrapper { height: auto !important; min-height: calc(100vh - 80px) !important; }
+    }
     @media (max-width: 768px) {
-      .right-page { overflow-y: auto !important; }
+      .right-page { overflow-y: visible !important; }
       .story-nav-controls {
         position: sticky !important;
         bottom: 0 !important;
