@@ -84,9 +84,6 @@ def generate_story():
     character = data.get("character", "")
     age       = data.get("age", "4-5")
 
-    # Determine page count by age — all 3 pages to match video assets
-    page_count = 3
-
     # Age-specific writing rules
     age_rules = {
         "4-5": """
@@ -186,7 +183,6 @@ MORAL: a thoughtful 1–2 sentence lesson that makes the child think. """
     }
 
     rules = age_rules.get(age, age_rules["6-7"])
-    pages_example = "\n".join([f'                "Page {i+1} text here"{"," if i < page_count-1 else ""}' for i in range(page_count)])
 
     # If OpenAI is ready, try to generate dynamically
     if HAS_OPENAI:
@@ -202,13 +198,18 @@ STORY DETAILS:
 
 {rules}
 
+CRITICAL: The "pages" array MUST have EXACTLY 3 items. No more, no less.
+Each page must be real story content — do NOT copy the example structure or placeholder text.
+
 Return ONLY valid JSON with NO markdown, NO code fences, NO extra text — just the raw JSON:
 {{
-  "title": "Story Title",
+  "title": "A real story title here",
   "pages": [
-{pages_example}
+    "Full paragraph for Page 1 with 5 sentences of real story content.",
+    "Full paragraph for Page 2 with 5 sentences continuing the story.",
+    "Full paragraph for Page 3 with 5 sentences ending the story happily."
   ],
-  "moral": "The lesson of the story.",
+  "moral": "A real one-sentence lesson from this story.",
   "wrongMorals": [
     "A believable but wrong lesson",
     "Another believable but wrong lesson"
@@ -229,21 +230,31 @@ Return ONLY valid JSON with NO markdown, NO code fences, NO extra text — just 
                 response = client.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[{"role": "system", "content": system_prompt}],
-                    temperature=0.7
+                    temperature=0.7,
+                    max_tokens=1800
                 )
                 content = response.choices[0].message.content
             else:
-                # Fallback for old openai 
+                # Fallback for old openai
                 response = client.ChatCompletion.create(
                     model="gpt-3.5-turbo",
                     messages=[{"role": "system", "content": system_prompt}],
-                    temperature=0.7
+                    temperature=0.7,
+                    max_tokens=1800
                 )
                 content = response["choices"][0]["message"]["content"]
-            
+
             # Clean JSON if wrapped in markdown
             content = content.replace('```json', '').replace('```', '').strip()
             story_payload = json.loads(content)
+
+            # Force exactly 3 pages — strip extras if OpenAI returns more
+            if 'pages' in story_payload and isinstance(story_payload['pages'], list):
+                # Remove placeholder pages (e.g. "Page 1 text here")
+                real_pages = [p for p in story_payload['pages']
+                              if p and 'text here' not in p.lower() and 'lesson of the story' not in p.lower()]
+                story_payload['pages'] = real_pages[:3]
+
             story_payload["theme"] = theme
             story_payload["character"] = character
             story_payload["name"] = name
