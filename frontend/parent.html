@@ -858,7 +858,7 @@
               linkedChildren.includes((s.childName || '').toLowerCase()) ||
               linkedChildren.includes((s.name      || '').toLowerCase())
             )
-          : sessions;
+          : []; // no child linked — show empty, not all children's data
 
         // Recalculate stats from filtered sessions only
         const filteredStories   = filteredSessions.length;

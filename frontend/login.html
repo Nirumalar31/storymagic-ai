@@ -823,7 +823,9 @@
       } catch (err) {
         btn.textContent = 'Sign In as Parent';
         btn.disabled = false;
-        const msg = err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential'
+        const msg = err.code === 'auth/email-not-verified'
+          ? 'Please verify your email before logging in. Check your inbox for the verification link.'
+          : err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential'
           ? 'No account found. Please sign up first.'
           : err.code === 'auth/wrong-password'
           ? 'Incorrect password. Please try again.'
@@ -934,11 +936,16 @@
   <!-- Firebase Auth + Firestore for login + password reset (module) -->
   <script type="module">
     import { auth, db } from './firebase-config.js';
-    import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
     import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
     window._fbSignIn = async (email, password) => {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      // Block login if email has not been verified
+      if (!userCredential.user.emailVerified) {
+        await signOut(auth);
+        throw Object.assign(new Error('Please verify your email before logging in. Check your inbox for the verification link.'), { code: 'auth/email-not-verified' });
+      }
       // Fetch child name from Firestore so it works on any device
       try {
         const snap = await getDoc(doc(db, 'userSettings', email.toLowerCase()));
