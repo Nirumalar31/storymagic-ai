@@ -734,7 +734,12 @@
     /* ── Guard: parent-only access ───────────────────────── */
     (function checkAccess() {
       const user = getCurrentUser();
-      if (!user || user.role !== 'parent' || !sessionStorage.getItem('_sm_active')) {
+      // If no active session (tab reopened), go straight to login
+      if (!sessionStorage.getItem('_sm_active')) {
+        window.location.replace('login.html');
+        return;
+      }
+      if (!user || user.role !== 'parent') {
         // Show overlay immediately
         const overlay = document.getElementById('accessDeniedOverlay');
         overlay.classList.add('visible');
