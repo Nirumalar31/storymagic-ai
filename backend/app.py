@@ -131,13 +131,18 @@ SENTENCES:
 - BAD: "Despite her trepidation, she courageously proceeded into the unknown."
 
 STRUCTURE:
-- Write EXACTLY 3 pages.
-- Each page: 5 to 6 sentences.
-- Include ONE small problem the character solves with a simple idea.
-- Add ONE fun surprise (a talking animal, a glowing door, a kind stranger).
+- Write EXACTLY 3 pages. NOT 4. EXACTLY 3.
+- EACH page MUST have EXACTLY 5 sentences. Count them — 1, 2, 3, 4, 5.
+- Page 1: Introduce the character, setting and mood. 5 sentences.
+- Page 2: A problem or challenge appears. Character tries to help. 5 sentences.
+- Page 3: Problem is solved. Everyone feels happy and proud. 5 sentences.
+- Include ONE fun surprise (a talking animal, a glowing door, a kind stranger).
+
+EXAMPLE of a good page (5 sentences):
+"{name} walked into the magical forest with {character} by their side. The trees were tall and sparkled with golden light. Suddenly, they heard a small cry from behind a big rock. A tiny rabbit was stuck in the mud, looking very scared. {name} smiled and said, I will help you!"
 
 STORY:
-- Clear beginning, middle, end across 4 pages.
+- Clear beginning, middle, end.
 - Emotions: excited, worried, brave, proud, relieved.
 
 QUIZ: ask the child to remember one key thing that happened.
@@ -157,7 +162,11 @@ SENTENCES:
 - Each page: 6 to 9 sentences.
 
 STRUCTURE:
-- Write EXACTLY 3 pages.
+- Write EXACTLY 3 pages. NOT 4. EXACTLY 3 pages.
+- EACH page MUST have EXACTLY 6 sentences. Count them — 1, 2, 3, 4, 5, 6.
+- Page 1: Set the scene and introduce the challenge.
+- Page 2: The character struggles and tries different approaches.
+- Page 3: The character succeeds and learns something.
 - Include a real challenge that takes more than one try to solve.
 - Show the character's inner thoughts and feelings — not just actions.
 - Add a meaningful turning point or growth moment.
