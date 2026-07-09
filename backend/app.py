@@ -230,8 +230,8 @@ Return ONLY valid JSON with NO markdown, NO code fences, NO extra text — just 
                 response = client.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[{"role": "system", "content": system_prompt}],
-                    temperature=0.7,
-                    max_tokens=1800
+                    temperature=0.8,
+                    max_tokens=2500
                 )
                 content = response.choices[0].message.content
             else:
@@ -239,8 +239,8 @@ Return ONLY valid JSON with NO markdown, NO code fences, NO extra text — just 
                 response = client.ChatCompletion.create(
                     model="gpt-3.5-turbo",
                     messages=[{"role": "system", "content": system_prompt}],
-                    temperature=0.7,
-                    max_tokens=1800
+                    temperature=0.8,
+                    max_tokens=2500
                 )
                 content = response["choices"][0]["message"]["content"]
 
@@ -248,18 +248,21 @@ Return ONLY valid JSON with NO markdown, NO code fences, NO extra text — just 
             content = content.replace('```json', '').replace('```', '').strip()
             story_payload = json.loads(content)
 
-            # Force exactly 3 pages — strip extras if OpenAI returns more
+            # Keep only real pages — skip exact placeholder strings
             if 'pages' in story_payload and isinstance(story_payload['pages'], list):
-                # Remove placeholder pages (e.g. "Page 1 text here")
+                PLACEHOLDERS = {'page 1 text here', 'page 2 text here', 'page 3 text here',
+                                'full paragraph for page 1', 'full paragraph for page 2', 'full paragraph for page 3'}
                 real_pages = [p for p in story_payload['pages']
-                              if p and 'text here' not in p.lower() and 'lesson of the story' not in p.lower()]
-                story_payload['pages'] = real_pages[:3]
+                              if isinstance(p, str) and p.strip().lower() not in PLACEHOLDERS]
+                if real_pages:
+                    story_payload['pages'] = real_pages[:3]
 
             story_payload["theme"] = theme
             story_payload["character"] = character
             story_payload["name"] = name
+            print(f"OpenAI story generated OK — {len(story_payload.get('pages', []))} pages")
             return jsonify(story_payload)
-            
+
         except Exception as e:
             print(f"OpenAI Generation Failed: {e}")
             # Fall through to hardcoded fallback if API fails
