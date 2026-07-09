@@ -771,7 +771,7 @@
 
       // ── Daily Time Limit ────────────────────────────────────
       if (localStorage.getItem('setting_timeLimit') === '1') {
-        const limitMins = 60;
+        const limitMins = 5;
         setTimeout(() => {
           if (speaking) stopNarration();
           const ol = document.createElement('div');
