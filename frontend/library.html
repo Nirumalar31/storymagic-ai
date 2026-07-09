@@ -290,8 +290,12 @@
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
-      // Try loading saved stories from Firebase; fall back to localStorage
-      await new Promise(r => setTimeout(r, 500));
+      // Wait up to 4s for Firebase module to be ready, then fall back to localStorage
+      let waited = 0;
+      while (typeof window.getSavedStoriesFromFirebase !== 'function' && waited < 4000) {
+        await new Promise(r => setTimeout(r, 100));
+        waited += 100;
+      }
       if (typeof window.getSavedStoriesFromFirebase === 'function') {
         const fb = await window.getSavedStoriesFromFirebase();
         if (fb.length) {
