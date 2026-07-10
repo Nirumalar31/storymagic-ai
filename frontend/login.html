@@ -943,7 +943,8 @@
 
     window._fbSignIn = async (email, password) => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      // Block login if email has not been verified
+      // Force refresh user data from Firebase to get latest emailVerified status
+      await userCredential.user.reload();
       if (!userCredential.user.emailVerified) {
         await signOut(auth);
         throw Object.assign(new Error('Please verify your email before logging in. Check your inbox for the verification link.'), { code: 'auth/email-not-verified' });
