@@ -1,3 +1,6 @@
+# StoryMagic AI — PSM2 Final Year Project by Nirumalar Santharan, UTM
+# PSM2 presentation completed on 10 July 2026. Alhamdulillah!
+
 import os
 import json
 from flask import Flask, request, jsonify, send_from_directory, make_response
