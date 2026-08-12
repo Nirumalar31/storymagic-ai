@@ -339,7 +339,13 @@ Return ONLY valid JSON with NO markdown, NO code fences, NO extra text — just 
             story_payload["theme"] = theme
             story_payload["character"] = character
             story_payload["name"] = name
-            print(f"OpenAI story generated OK — {len(story_payload.get('pages', []))} pages")
+
+            # Normalize key name so the frontend always finds "story"
+            # (the fallback path below returns "story", but the raw OpenAI
+            # JSON uses "pages" — story.html only ever reads storyData.story)
+            story_payload["story"] = story_payload.pop("pages", [])
+
+            print(f"OpenAI story generated OK — {len(story_payload.get('story', []))} pages")
             return jsonify(story_payload)
 
         except Exception as e:

@@ -500,9 +500,17 @@
       document.getElementById('loadingOverlay').classList.remove('hidden');
       startLoadingTips();
 
-      const mappedAge = ageMap[selectedAge] || selectedAge;
-      const payload = { name: nameInput, prompt: "a fun adventure", theme: selectedTheme, character: selectedCharacter, age: mappedAge };
+     const mappedAge = ageMap[selectedAge] || selectedAge;
 
+let userEmail = null;
+try {
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+  userEmail = currentUser ? currentUser.email : null;
+} catch (e) {
+  userEmail = null;
+}
+
+const payload = { name: nameInput, prompt: "a fun adventure", theme: selectedTheme, character: selectedCharacter, age: mappedAge, user_email: userEmail };
       try {
         const res = await fetch('/generate-story', {
           method: 'POST',
