@@ -3,9 +3,13 @@
 
 import os
 import json
+from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory, make_response
 from flask_cors import CORS
 from dotenv import load_dotenv
+import stripe
+import firebase_admin
+from firebase_admin import credentials, firestore
 
 # Load environment variables
 load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
@@ -13,6 +17,17 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend")
 app = Flask(__name__, static_folder=frontend_path, static_url_path="")
 CORS(app)  # Allow cross-origin requests
+
+# --------- Initialize Firebase Admin (backend) ---------
+if not firebase_admin._apps:
+    cred = credentials.Certificate(os.environ.get("FIREBASE_ADMIN_CREDENTIALS_PATH"))
+    firebase_admin.initialize_app(cred)
+db = firestore.client()
+
+# --------- Initialize Stripe ---------
+stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
+STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET")
+MONTHLY_STORY_CAP = 20
 
 # --------- Initialize AI & TTS Clients Safely ---------
 HAS_OPENAI = False
@@ -77,10 +92,72 @@ def login_page():
 def signup_page():
     return send_from_directory(frontend_path, "signup.html")
 
+# ── API: Stripe Webhook ─────────────────────────────────
+@app.route("/stripe-webhook", methods=["POST"])
+def stripe_webhook():
+    payload = request.data
+    sig_header = request.headers.get("Stripe-Signature")
+
+    try:
+        event = stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEBHOOK_SECRET)
+    except (ValueError, stripe.error.SignatureVerificationError):
+        return jsonify({"error": "Invalid signature"}), 400
+
+    event_type = event["type"]
+    data = event["data"]["object"]
+
+    # New subscription started (first payment success)
+    if event_type == "checkout.session.completed":
+        email = data["customer_details"]["email"]
+        stripe_customer_id = data["customer"]
+        db.collection("userSettings").document(email).set(
+            {"paid": True, "stripe_customer_id": stripe_customer_id}, merge=True
+        )
+
+    # Monthly renewal succeeded
+    elif event_type == "invoice.paid":
+        _update_by_stripe_customer_id(data["customer"], {"paid": True})
+
+    # Payment failed (card declined, etc.)
+    elif event_type == "invoice.payment_failed":
+        _update_by_stripe_customer_id(data["customer"], {"paid": False})
+
+    # Subscription cancelled
+    elif event_type == "customer.subscription.deleted":
+        _update_by_stripe_customer_id(data["customer"], {"paid": False})
+
+    return jsonify({"status": "success"}), 200
+
+
+def _update_by_stripe_customer_id(stripe_customer_id, updates):
+    docs = db.collection("userSettings").where("stripe_customer_id", "==", stripe_customer_id).limit(1).get()
+    for doc in docs:
+        doc.reference.update(updates)
+
 # ── API: Generate Story (OpenAI or Fallback) ────────────
 @app.route("/generate-story", methods=["POST"])
 def generate_story():
-    data      = request.json or {}
+    data = request.json or {}
+    user_email = data.get("user_email")  # frontend sends the logged-in user's email
+
+    if not user_email:
+        return jsonify({"error": "Not logged in."}), 401
+
+    user_ref = db.collection("userSettings").document(user_email)
+    user_doc = user_ref.get()
+    user = user_doc.to_dict() if user_doc.exists else {}
+
+    if not user.get("paid"):
+        return jsonify({"error": "Please subscribe to generate stories."}), 403
+
+    current_month = datetime.now().strftime("%Y-%m")
+    story_count = user.get("story_count", 0) if user.get("story_month") == current_month else 0
+
+    if story_count >= MONTHLY_STORY_CAP:
+        return jsonify({"error": "Monthly story limit reached."}), 403
+
+    user_ref.set({"story_month": current_month, "story_count": story_count + 1}, merge=True)
+
     prompt    = data.get("prompt", "adventure")
     name      = data.get("name", "Explorer")
     theme     = data.get("theme", "land")
@@ -226,7 +303,7 @@ Return ONLY valid JSON with NO markdown, NO code fences, NO extra text — just 
     ]
   }}
 }}"""
-            
+
             # Use OpenAI
             if hasattr(client, 'chat'):
                 response = client.chat.completions.create(
@@ -515,7 +592,7 @@ def generate_tts():
     data = request.json or {}
     text = data.get("text", "")
     voice_name = data.get("voice", "en-US-Journey-F")
-    
+
     if not text:
         return jsonify({"error": "No text provided."}), 400
 
